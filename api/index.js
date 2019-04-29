@@ -198,17 +198,31 @@ app.post('/login', (req, res) => {
 app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (!err) {
-            res.status(200).end({
+            res.status(200).send({
                 body: 'success'
             })
         } else {
             console.error(err)
-            res.status(500).end({
+            res.status(500).send({
                 body: 'Cannot logout',
                 reason: 'SERVER_ERROR'
             })
         }
     })
+})
+
+app.get('/session', (req, res) => {
+    if (req.session.uid) {
+        res.status(200).send({
+            body: 'success',
+            uid: req.session.uid
+        });
+    } else {
+        res.status(500).send({
+            body: 'Invalid session',
+            reason: 'SESSION_EXPIRED'
+        })
+    }
 })
 
 function isEmailValid(email) {
