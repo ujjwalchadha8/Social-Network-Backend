@@ -271,6 +271,39 @@ app.get('/get_post_content', (req, res) => {
     }
 })
 
+app.get('/get_posts_user', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+		
+        let sql = "CALL get_post_user(?);";
+        con.query(sql,[req.session.uid],(err, sqlResult) => {
+			
+            if (err) {
+				console.log(err);
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Posts does not exist',
+                    reason: 'PROFILE_NOT_FOUND',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: sqlResult[0]
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
+
 
 
 function isEmailValid(email) {
