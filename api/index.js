@@ -236,6 +236,43 @@ app.get('/session', (req, res) => {
     }
 })
 
+
+
+app.get('/get_post_content', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+		
+        let sql = "CALL get_post_content_latest(?);";
+        con.query(sql,[req.session.uid],(err, sqlResult) => {
+			
+            if (err) {
+				console.log(err);
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Posts does not exist',
+                    reason: 'PROFILE_NOT_FOUND',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: sqlResult[0]
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
+
+
+
 function isEmailValid(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
