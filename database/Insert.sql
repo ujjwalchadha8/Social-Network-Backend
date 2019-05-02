@@ -41,14 +41,14 @@ insert into Location values (3, 30.8734, 50.1210, 'Chipotle', 'San Francisco', '
 insert into Location values (4, 38.7128, 71.0060, 'Reading Market', 'Philadelphia', 'Pennsylvania', 'USA');
 insert into Location values (5, 40.7128, 74.0060, 'IKEA', 'New York City', 'New York', 'USA');
 
-insert into Posts values (1, 1, 1, '2019-04-5 10:00:00', 'private');
+insert into Posts values (1, 1, 1, '2019-04-5 10:00:00', 2);
 insert into PostContent values (1, 1, 'text', 'Hello Everyone. How are you? Please read my latest book.');
 insert into PostContent values (2, 1, 'pdf', 'https://www.blogpost.com/alex.pdf');
 
-insert into Posts values (2, 2, 2, '2019-04-5 10:00:00', 'public');
+insert into Posts values (2, 2, 2, '2019-04-5 10:00:00', 1);
 insert into PostContent values (3, 2, 'text', 'Hello all.');
 
-insert into Posts values (3, 3, 2, '2019-04-5 10:00:00', 'public');
+insert into Posts values (3, 3, 2, '2019-04-5 10:00:00', 1);
 insert into PostContent values (4, 3, 'text', 'University Selection');
 
 insert into Photos values (1, 1, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/IMG_0203.CR2.jpg'));
@@ -56,6 +56,27 @@ insert into Photos values (1, 1, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/I
 insert into Comments values (1, 1, 1, "This is very good. Thanks", now());
 insert into Comments values (2, 2, 1, "Interesting", now());
 insert into Comments values (3, 3, 2, "I'm in!", now());
+
+insert into restrictions values(1,'public',null);
+insert into restrictions values(2,'private',null);
+insert into restrictions values(3,'friends-of-friends',null);
+
+
+insert into Posts values (4, 4, 2, now(), 1);
+insert into PostContent values (6, 4, 'text', 'welcome to NYU!!');
+
+insert into Posts values (5, 5, 2, now(), 1);
+insert into PostContent values (7, 5, 'text', 'Graduated!!');
+
+insert into Posts values (6, 6, 1, now(), 3);
+insert into PostContent values (9, 6, 'text', 'Should go to Gracehopper conference');
+
+insert into Posts values (7, 5, 2, now(), 2);
+insert into PostContent values (7, 5, 'text', 'Did you do Db project');
+
+insert into Posts values (8, 3, 2, now(), 1);
+insert into PostContent values (10, 8, 'text', 'This is kiran');
+
 
 
 
