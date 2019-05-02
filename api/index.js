@@ -262,7 +262,9 @@ app.get('/get_post_content', (req, res) => {
                 })
             } else if (sqlResult.length > 0) {
                 res.status(200).send({
-                    body: sqlResult[0]
+                    body: {
+						posts:sqlResult
+					}
                 })
             } else {
                 new assert.AssertionError('Unique field cannot have 2 rows with same value');
@@ -295,7 +297,42 @@ app.get('/get_posts_user', (req, res) => {
                 })
             } else if (sqlResult.length > 0) {
                 res.status(200).send({
-                    body: sqlResult[0]
+                    body: {
+						posts:sqlResult
+					}
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
+
+app.get('/get_events', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {       
+        let sql = "select events.Description,events.Event_date,events.Type,events.Title,location.name,location.name,location.city,location.state,location.country from events inner join location on events.location_id = location.LID order by timestamp;";
+        
+        con.query(sql,[],(err, sqlResult) => {
+            if (err) {
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Events does not exist',
+                    reason: 'Evnets_NOT_FOUND',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: {
+                        events: sqlResult
+                    }
                 })
             } else {
                 new assert.AssertionError('Unique field cannot have 2 rows with same value');

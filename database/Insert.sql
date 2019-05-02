@@ -77,6 +77,27 @@ insert into PostContent values (7, 5, 'text', 'Did you do Db project');
 insert into Posts values (8, 3, 2, now(), 1);
 insert into PostContent values (10, 8, 'text', 'This is kiran');
 
+insert into Photos values (2, 4, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/IMG_0203.CR2.jpg'));
+
+
+insert into events (location_id,Type,Event_date,timestamp,Title,Description)
+values(2,"Seminar","2019-05-08 13:00:00",now(),"AI in Robotics","Explore how Ai and computer vision change the world of automation");
+
+insert into events (location_id,Type,Event_date,timestamp,Title,Description)
+values(2,"Commencement","2019-05-22 13:00:00",now(),"NYU 2019 Commencement","NYU Tnadon commencement for 2019 class");
+
+insert into events (location_id,Type,Event_date,timestamp,Title,Description)
+values(1,"AD","2019-05-11 13:00:00",now(),"Free Pizza","Get NYU card!! get Pizza!!");
+
+insert into events (location_id,Type,Event_date,timestamp,Title,Description)
+values(4,"Fests","2019-04-22 13:00:00",now(),"Cherry Blossom","Visit Philly!!");
+
+insert into events (location_id,Type,Event_date,timestamp,Title,Description)
+values(2,"OSARC","2019-05-15 13:00:00",now(),"Stress Buster","come LC223 to relieve strees!!");
+
+insert into events (location_id,Type,Event_date,timestamp,Title,Description)
+values(5,"AD","2019-05-22 13:00:00",now(),"IKEA Student","New student Discount");
+
 
 
 
