@@ -60,6 +60,7 @@ app.get('/get-profile', (req, res) => {
                     reason: 'PROFILE_NOT_FOUND',
                 })
             } else if (sqlResult.length == 1) {
+				console.log("profile " + sqlResult[0]);
                 res.status(200).send({
                     body: {
                         profile: sqlResult[0]
