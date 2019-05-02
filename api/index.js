@@ -39,8 +39,16 @@ app.get('/get-profile', (req, res) => {
             reason: 'SESSION_EXPIRED'
         })
     } else {
-        let sql = "select displayName, email, gender, age, city from StudentProfile where uid = ?";
-        con.query(sql, [req.session.uid], (err, sqlResult) => {
+        let sql;
+        let args;
+        if (req.query.username) {
+            sql = "select displayName, email, gender, age, city, timestamp from StudentProfile inner join StudentAccount on StudentProfile.uid = StudentAccount.uid where StudentAccount.username = ?";            
+            args = [req.query.username]
+        } else {
+            sql = "select displayName, email, gender, age, city, timestamp from StudentProfile where uid = ?";
+            args = [req.session.uid]
+        }
+        con.query(sql, args, (err, sqlResult) => {
             if (err) {
                 res.status(500).send({
                     body: 'Internal server error',
@@ -53,7 +61,9 @@ app.get('/get-profile', (req, res) => {
                 })
             } else if (sqlResult.length == 1) {
                 res.status(200).send({
-                    body: sqlResult[0]
+                    body: {
+                        profile: sqlResult[0]
+                    }
                 })
             } else {
                 new assert.AssertionError('Unique field cannot have 2 rows with same value');
