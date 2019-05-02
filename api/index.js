@@ -341,6 +341,66 @@ app.get('/get_events', (req, res) => {
     }
 })
 
+app.post('/get_group_posts', (req, res) => {
+    let sql = "call get_group_posts(?);";
+    let vars = [req.body.groupID];
+    con.query(sql, vars, (err, sqlResult) => {
+        if (err) {
+            console.error(err)
+            res.status(500).send({
+                body: 'Couldn`t proceed with request',
+                reason: 'SERVER_ERROR'
+            })
+        } else {
+            if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Invalid GroupID',
+                    reason: 'INVALID_Group',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: sqlResult
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        }
+    })
+})
+
+app.get('/get_user_groups', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {       
+        let sql = "call get_user_groups(?);";
+        
+        con.query(sql,[req.session.uid],(err, sqlResult) => {
+            if (err) {
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Events does not exist',
+                    reason: 'Evnets_NOT_FOUND',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: {
+                        events: sqlResult
+                    }
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
+
 
 
 function isEmailValid(email) {

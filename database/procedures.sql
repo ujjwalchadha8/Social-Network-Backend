@@ -50,11 +50,41 @@ inner join studentaccount on posts.user_id = studentaccount.UID
 inner join restrictions on posts.restriction_id = restrictions.RID
 left outer join photos on posts.PID = photos.post_id
 left outer join location on posts.location_id = location.LID
-where posts.user_id = id
+where posts.user_id = id and posts.restriction_id in (1,2,3)
 order by time;
 END //
 delimiter ;
 ---------------------------------------------------------------
+Delimiter //
+create procedure get_group_posts(IN group_id INT)
+begin
+select p.PID,p.user_id,p.timestamp,p.restriction_id,G.content_type,G.content_data,ph.photo,l.name locationName,l.city,l.state,l.country,s.displayname,sc.username,r.type restrictionType,r.group_id,sg.Title grouptitle,sg.Description groupdesc from posts p 
+inner join postcontent G on p.PID = G.post_id
+left outer join photos ph on p.PID = ph.post_id
+inner join location l on p.location_id = l.LID
+inner join studentprofile s on p.user_id = s.UID
+inner join studentaccount sc on p.user_id = sc.UID
+inner join restrictions r on p.restriction_id = r.RID
+inner join sgroups sg on r.group_id = sg.GID
+where r.group_id = group_id
+order by timestamp;
+end//
+delimiter ;
+------------------------------------------------------------
+
+delimiter //
+create procedure get_user_groups(IN id INT)
+begin
+select s.UID,s.username,p.displayname,sg.GID,sg.timestamp,g.Title,g.Description FROM studentaccount s
+inner join studentprofile p on s.UID = p.UID
+inner join studentgroup sg on sg.UID = s.UID
+inner join sgroups g on sg.GID = g.GID
+where s.UID = id
+order by g.Title;
+END//
+delimiter ;
+--------------------------------------------------------------
+
 
 
 
