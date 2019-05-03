@@ -363,7 +363,7 @@ app.get('/get_events', (req, res) => {
             reason: 'SESSION_EXPIRED'
         })
     } else {       
-        let sql = "select events.Description,events.Event_date,events.Type,events.Title,location.name,location.name,location.city,location.state,location.country from events inner join location on events.location_id = location.LID order by timestamp;";
+        let sql = "select events.EID,events.Description,events.Event_date,events.Type,events.Title,location.name,location.name,location.city,location.state,location.country from events inner join location on events.location_id = location.LID order by timestamp;";
         
         con.query(sql,[],(err, sqlResult) => {
             if (err) {

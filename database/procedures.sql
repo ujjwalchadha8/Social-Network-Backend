@@ -127,7 +127,7 @@ drop procedure if exists get_comments;
 delimiter //
 create procedure get_comments(IN id INT)
 BEGIN
-select comments.user_id,comments.text,comments.timestamp,studentprofile.displayname,studentaccount.username 
+select comments.CID,comments.user_id,comments.text,comments.timestamp,studentprofile.displayname,studentaccount.username 
 from comments inner join studentprofile on comments.user_id = studentprofile.UID
 inner join studentaccount on comments.user_id = studentaccount.UID
 where comments.post_id = id;
