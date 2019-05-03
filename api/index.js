@@ -499,7 +499,8 @@ app.get('/get_friends', (req, res) => {
         })
     }
 })
-app.post('/get_comments', (req, res) => {
+
+app.get('/get_comments', (req, res) => {
     let sql = "call get_comments(?);";
     let vars = [req.body.postID];
     con.query(sql, vars, (err, sqlResult) => {
@@ -525,6 +526,7 @@ app.post('/get_comments', (req, res) => {
         }
     })
 })
+
 app.get('/get_friends_status_requests', (req, res) => {
     if (!req.session.uid) {
         res.status(500).send({
