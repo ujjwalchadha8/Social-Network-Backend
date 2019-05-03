@@ -23,7 +23,7 @@ drop procedure if exists get_post_content_latest;
 delimiter //
 create procedure get_post_content_latest(IN id int)
 BEGIN
-select posts.PID,posts.user_id,studentaccount.username,studentprofile.displayname,postcontent.content_type,postcontent.content_data,photos.photo,restrictions.type,location.name locationName,
+select distinct posts.PID,posts.user_id,studentaccount.username,studentprofile.displayname,postcontent.content_type,postcontent.content_data,photos.photo,restrictions.type,location.name locationName,
 location.city,location.state,location.country,posts.timestamp time from posts 
 inner join postcontent on posts.PID = postcontent.post_id 
 inner join studentprofile on posts.user_id = studentprofile.UID
@@ -175,6 +175,38 @@ update studentrelations set status = "blocked", timestamp = now() where user_id 
 update studentrelations set status = "blocked", timestamp = now() where user_id = fid and friend_id = id;
 END//
 delimiter ;
+-------------------------------------------------------
+drop procedure if exists checkfriend;
+delimiter //
+create procedure checkfriend(IN uid int, IN fid int)
+BEGIN
+declare isFriend int;
+declare isBlocked int;
+select count(*) into isFriend from studentrelations where user_id = uid and friend_id = fid and status = "friends";
+select count(*) into isBlocked from studentrelations where user_id = uid and friend_id = fid and status = "blocked";
+if isblocked =0 and isFriend = 0 THEN call get_post_any_user_not_friend(fid);
+elseif isblocked =0 and isFriend >0 THEN call get_post_user(fid);
+end if;
+end//
+delimiter ;
+-------------------------------------------------------------------------
+drop procedure if exists get_post_any_user_not_friend;
+delimiter //
+create procedure get_post_any_user_not_friend(IN id int)
+BEGIN
+select posts.PID,posts.user_id,studentaccount.username,studentprofile.displayname,postcontent.content_type,postcontent.content_data,photos.photo,restrictions.type,location.name locationName,
+location.city,location.state,location.country,posts.timestamp time from posts 
+inner join postcontent on posts.PID = postcontent.post_id 
+inner join studentprofile on posts.user_id = studentprofile.UID
+inner join studentaccount on posts.user_id = studentaccount.UID
+inner join restrictions on posts.restriction_id = restrictions.RID
+left outer join photos on posts.PID = photos.post_id
+left outer join location on posts.location_id = location.LID
+where posts.user_id = id and posts.restriction_id =1
+order by time;
+END//
+delimiter;
+
 
 
 

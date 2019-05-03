@@ -318,9 +318,19 @@ app.get('/get_posts_user', (req, res) => {
             reason: 'SESSION_EXPIRED'
         })
     } else {
+		let sql;
+		let vars;
+		if(req.body.userID){
+			sql = "call checkfriend(?,?);";
+			vars = [req.session.uid,req.body.userID]
+		}
+		else {
+			sql = "CALL get_post_user(?);";
+			vars = [req.session.uid]
+		}
 		
-        let sql = "CALL get_post_user(?);";
-        con.query(sql,[req.session.uid],(err, sqlResult) => {
+        
+        con.query(sql,vars,(err, sqlResult) => {
 			
             if (err) {
 				console.log(err);
@@ -660,6 +670,105 @@ app.post('/block_request', (req, res) => {
             } else {
                 console.error(err);
 				console.log(sql);
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {
+            res.status(200).send({
+                body: 'success'
+            })
+        }
+    });
+})
+
+app.post('/add_event', (req, res) => {
+    let sql = "insert into events(Description,Event_date,location_id,Title,Type,timestamp) values(?,?,?,?,?,now())";
+    let vars = [req.body.description, req.body.eventDate,req.body.locationID,req.body.title,req.body.type];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.error(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {
+            res.status(200).send({
+                body: 'success'
+            })
+        }
+    });
+})
+
+app.post('/add_comment', (req, res) => {
+    let sql = "insert into Comments(user_id,post_id,text,timestamp) values(?,?,?,now())";
+    let vars = [req.session.uid, req.body.postID,req.body.commentText];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.error(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {
+            res.status(200).send({
+                body: 'success'
+            })
+        }
+    });
+})
+
+app.post('/add_like', (req, res) => {
+    let sql = "insert into likes(user_id,post_id,timestamp) values(?,?,now())";
+    let vars = [req.session.uid, req.body.postID];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.error(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {
+            res.status(200).send({
+                body: 'success'
+            })
+        }
+    });
+})
+app.post('/add_group', (req, res) => {
+    let sql = "insert into SGroups(timestamp,Title,Description) values(?,?,now())";
+    let vars = [req.session.uid, req.body.postID];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.error(err)
                 res.status(500).send({
                     body: 'Couldn`t proceed with request',
                     reason: 'SERVER_ERROR'
