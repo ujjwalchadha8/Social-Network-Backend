@@ -42,14 +42,15 @@ app.get('/get-profile', (req, res) => {
         let sql;
         let args;
         if (req.query.username) {
-            sql = "select displayName, email, gender, age, city, timestamp from StudentProfile inner join StudentAccount on StudentProfile.uid = StudentAccount.uid where StudentAccount.username = ?";            
+            sql = "select StudentAccount.uid, username, displayName, email, gender, age, city, timestamp from StudentProfile inner join StudentAccount on StudentProfile.uid = StudentAccount.uid where StudentAccount.username = ?";            
             args = [req.query.username]
         } else {
-            sql = "select displayName, email, gender, age, city, timestamp from StudentProfile where uid = ?";
+            sql = "select StudentAccount.uid, username, displayName, email, gender, age, city, timestamp from StudentProfile inner join StudentAccount on StudentProfile.uid = StudentAccount.uid where StudentAccount.uid = ?";
             args = [req.session.uid]
         }
         con.query(sql, args, (err, sqlResult) => {
             if (err) {
+                console.error(err);
                 res.status(500).send({
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
@@ -60,18 +61,55 @@ app.get('/get-profile', (req, res) => {
                     reason: 'PROFILE_NOT_FOUND',
                 })
             } else if (sqlResult.length == 1) {
-				console.log("profile " + sqlResult[0]);
-                res.status(200).send({
-                    body: {
-                        profile: sqlResult[0]
+                let profile = sqlResult[0];
+                if (req.session.uid === profile.uid) {
+                    profile.data = {
+                        relation: 'me'
                     }
-                })
+                    res.status(200).send({
+                        body: {
+                            profile: profile
+                        }
+                    })
+                } else {
+                    getFriendshipStatus(req.session.uid, profile.uid, (response) => {
+                        console.log(response);
+                        profile.data = {
+                            relation: response
+                        }
+                        res.status(200).send({
+                            body: {
+                                profile: profile
+                            }
+                        })
+                    }, (err) => console.error(err))
+                }
+                console.log(JSON.stringify(profile));
+                
             } else {
                 new assert.AssertionError('Unique field cannot have 2 rows with same value');
             }
         })
     }
 })
+
+function getFriendshipStatus(uidFrom, uidTo, successCallback, errorCallback) {
+    let sql = "select status from StudentRelations where user_id = ? and friend_id = ?";
+    console.log(uidFrom, uidTo);
+    con.query(sql, [uidFrom, uidTo], (err, sqlResult) => {
+        if (err) {
+            errorCallback(err);
+        } else {
+            if (sqlResult.length == 0) {
+                successCallback('unknown')
+            } else if (sqlResult.length == 1){
+                successCallback(sqlResult[0].status)
+            } else {
+                throw new assert.AssertionError("Cannot have more than 1 records for this request");
+            }
+        }
+    })
+}
 
 app.post('/update-profile', (req, res) => {
     if (!req.session.uid) {
