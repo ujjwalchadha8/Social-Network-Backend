@@ -113,7 +113,7 @@ drop table if exists Restrictions;
 create table Restrictions (
     RID integer primary key auto_increment,
     type varchar(40) not null,
-    group_id integer not null references sgroups(GID) ,
+    group_id integer references sgroups(GID) ,
     check (type in ('public', 'private', 'friends-of-friends',’group’))
 
 );

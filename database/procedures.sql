@@ -1,13 +1,17 @@
 DELIMITER //
 Create PROCEDURE get_friends(IN id INT)
 BEGIN
-select friend_id
-from studentrelations 
+select studentrelations.friend_id,studentprofile.displayname,studentaccount.username
+from studentrelations inner join studentprofile 
+on studentrelations.friend_id = studentprofile.UID
+inner join studentaccount on studentrelations.friend_id = studentaccount.UID
 where user_id = id and status = 'friends'
 union
-select distinct UR2.friend_id
+select distinct UR2.friend_id,studentprofile.displayname,studentaccount.username
 from studentrelations UR1 inner join studentrelations UR2 
 on UR1.friend_id = UR2.user_id
+inner join studentprofile on UR2.friend_id = studentprofile.UID
+inner join studentaccount on UR2.friend_id = studentaccount.UID
 where UR1.user_id = id and UR2.friend_id != id and UR2.status = 'friends';
 END//
 delimiter ;
@@ -84,6 +88,73 @@ order by g.Title;
 END//
 delimiter ;
 --------------------------------------------------------------
+delimiter //
+create procedure get_groups_can_subscribe(IN id INT)
+begin
+select distinct sg.GID,g.Title,g.Description from
+studentgroup sg
+inner join sgroups g on sg.GID = g.GID
+where sg.GID not in (select studentgroup.GID from studentgroup where studentgroup.UID = id )
+order by g.Title;
+END//
+delimiter ;
+
+--------------------------------------------------------------------------
+delimiter //
+create procedure get_direct_friends(IN id INT)
+BEGIN
+select distinct r.friend_id ,p.displayname,sc.username
+from studentrelations r 
+inner join studentprofile p on r.friend_id = p.UID
+inner join studentaccount sc on r.friend_id = sc.UID
+where user_id = id and status = 'friends';
+END//
+delimiter;
+-------------------------------------------------
+delimiter //
+create procedure get_comments(IN id INT)
+BEGIN
+select comments.user_id,comments.text,comments.timestamp,studentprofile.displayname,studentaccount.username 
+from comments inner join studentprofile on comments.user_id = studentprofile.UID
+inner join studentaccount on comments.user_id = studentaccount.UID
+where comments.post_id = id;
+END//
+delimiter ;
+-------------------------------------------------------------
+delimiter //
+create procedure get_status_friend_requests(IN id INT)
+BEGIN
+select r.friend_id,r.status,p.displayname,sc.username from studentrelations r
+inner join studentaccount sc on r.friend_id = sc.UID
+inner join studentprofile p on r.friend_id = p.UID
+where r.status <> "friends" and r.user_id = id;
+end//
+delimiter ;
+------------------------------------------------------------
+delimiter //
+create procedure send_friend_request(IN uid int, IN fid int)
+BEGIN
+insert into studentrelations values(uid,fid,"requested", now());
+insert into studentrelations values(fid,uid,"received",now());
+END//
+delimiter ;
+--------------------------------------------------------
+delimiter //
+create procedure accept_friend_request(IN id int, IN fid int)
+BEGIN
+update studentrelations set status = "friends", timestamp = now() where user_id = id and friend_id = fid;
+update studentrelations set status = "friends", timestamp = now() where user_id = fid and friend_id = id;
+END//
+delimiter ;
+------------------------------------------------------------
+delimiter //
+create procedure block_friend_request(IN id int, IN fid int)
+BEGIN
+update studentrelations set status = "blocked", timestamp = now() where user_id = id and friend_id = fid;
+update studentrelations set status = "blocked", timestamp = now() where user_id = fid and friend_id = id;
+END//
+delimiter ;
+
 
 
 

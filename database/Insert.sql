@@ -98,6 +98,107 @@ values(2,"OSARC","2019-05-15 13:00:00",now(),"Stress Buster","come LC223 to reli
 insert into events (location_id,Type,Event_date,timestamp,Title,Description)
 values(5,"AD","2019-05-22 13:00:00",now(),"IKEA Student","New student Discount");
 
+alter table SGroups AUTO_INCREMENT=100;
+	
+insert into SGroups(timestamp,Title,Description) 
+values(now(),"Data Science", "Updates on Data Science in Industry");
+
+insert into SGroups(timestamp,Title,Description) 
+values(now(),"DB project Group", "Updates on Project");
+
+insert into SGroups(timestamp,Title,Description) 
+values(now(),"NYU class of 2019", "Only 2019 Graduates");
+
+insert into SGroups(timestamp,Title,Description) 
+values(now(),"ONCampus Jobs", "Updates on oncampus job postings");
+
+insert into SGroups(timestamp,Title,Description) 
+values(now(),"Computer Science career", "Job postings for CS students");
+
+insert into studentgroup values(100,1,now());
+insert into studentgroup values(200,2,now());
+insert into studentgroup values(200,1,now());
+insert into studentgroup values(300,7,now());
+insert into studentgroup values(300,3,now());
+insert into studentgroup values(300,2,now());
+insert into studentgroup values(300,1,now());
+insert into studentgroup values(400,1,now());
+insert into studentgroup values(400,1,now());
+insert into studentgroup values(400,2,now());
+insert into studentgroup values(400,3,now());
+insert into studentgroup values(400,4,now());
+insert into studentgroup values(400,5,now());
+insert into studentgroup values(500,2,now());
+insert into studentgroup values(500,1,now());
+insert into studentgroup values(500,4,now());
+
+insert into restrictions(type,group_id) values("group", 100);
+insert into restrictions(type,group_id) values("group", 200);
+insert into restrictions(type,group_id) values("group", 300);
+insert into restrictions(type,group_id) values("group", 400);
+insert into restrictions(type,group_id) values("group", 500);
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (1, 2, now(), 4);
+insert into PostContent(post_id,content_type,content_data) values (9, 'text', 'welcome to Group!!');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (2, 2, now(), 5);
+insert into PostContent(post_id,content_type,content_data) values (10, 'text', 'Hello!!');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (1, 2, now(), 5);
+insert into PostContent(post_id,content_type,content_data) values (11, 'text', 'back end is Node and front end is React');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (7, 2, now(), 6);
+insert into PostContent(post_id,content_type,content_data) values (12, 'text', 'Congrats');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (3, 2, now(), 6);
+insert into PostContent(post_id,content_type,content_data) values (13, 'text', 'commencement on May 22');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (2, 2, now(), 6);
+insert into PostContent(post_id,content_type,content_data) values (14, 'text', 'need commencement tickets of ALL NYU yankee stadium');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (1, 2, now(),7);
+insert into PostContent(post_id,content_type,content_data) values (15, 'text', 'NYU IT oncampus job. Interested ping me!!');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (5, 2, now(), 7);
+insert into PostContent(post_id,content_type,content_data) values (16, 'text', 'Need Graduate Assistant in CS department front desk');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (8, 2, now(), 5);
+insert into PostContent(post_id,content_type,content_data) values (17, 'text', 'I set up the backend and some one should work on front end');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (4, 2, now(), 8);
+insert into PostContent(post_id,content_type,content_data) values (18, 'text', 'Google openings 2019. Apply on website');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (4, 2, now(), 7);
+insert into PostContent(post_id,content_type,content_data) values (19, 'text', 'Research assistantship in AI');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (3, 2, now(), 7);
+insert into PostContent(post_id,content_type,content_data) values (20, 'text', 'Graduate Assistant for NYU Graduates front desk');
+
+insert into Posts (user_id,location_id,timestamp,restriction_id) values (2, 2, now(), 7);
+insert into PostContent(post_id,content_type,content_data) values (21, 'text', 'Need help for survey');
+
+CID integer primary key auto_increment,
+    user_id integer not null references StudentAccount(UID),
+    post_id integer not null references Posts(PID),
+    text varchar(1000) not null,
+    timestamp datetime not null
+
+insert into Comments(user_id,post_id,text,timestamp)
+values(2,1,"Hello",now());
+
+insert into Comments(user_id,post_id,text,timestamp)
+values(2,3,"Yes",now())
+insert into Comments(user_id,post_id,text,timestamp)
+values(3,4,"Interesting",now())
+insert into Comments(user_id,post_id,text,timestamp)
+values(2,7,"I am curious",now())
+insert into Comments(user_id,post_id,text,timestamp)
+values(7,8,"yeah",now())
+insert into Comments(user_id,post_id,text,timestamp)
+values(5,4,"Hi",now())
+insert into Comments(user_id,post_id,text,timestamp)
+values(3,2,"Interesting",now())
+
 
 
 

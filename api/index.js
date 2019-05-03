@@ -401,6 +401,239 @@ app.get('/get_user_groups', (req, res) => {
     }
 })
 
+app.get('/get_groups_can_subscribe', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {       
+        let sql = "call get_groups_can_subscribe(?);";
+        
+        con.query(sql,[req.session.uid],(err, sqlResult) => {
+            if (err) {
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Events does not exist',
+                    reason: 'Evnets_NOT_FOUND',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: {
+                        events: sqlResult
+                    }
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
+
+app.get('/get_direct_friends', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {       
+        let sql = "call get_direct_friends(?);";
+        
+        con.query(sql,[req.session.uid],(err, sqlResult) => {
+            if (err) {
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Friends does not exist',
+                    reason: 'Friends_NOT_FOUND',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: {
+                        events: sqlResult
+                    }
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
+
+app.get('/get_friends', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {       
+        let sql = "call get_friends(?);";
+        
+        con.query(sql,[req.session.uid],(err, sqlResult) => {
+            if (err) {
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Friends does not exist',
+                    reason: 'Friends_NOT_FOUND',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: {
+                        events: sqlResult
+                    }
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
+app.post('/get_comments', (req, res) => {
+    let sql = "call get_comments(?);";
+    let vars = [req.body.postID];
+    con.query(sql, vars, (err, sqlResult) => {
+        if (err) {
+            console.error(err)
+            res.status(500).send({
+                body: 'Couldn`t proceed with request',
+                reason: 'SERVER_ERROR'
+            })
+        } else {
+            if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Invalid postID',
+                    reason: 'INVALID_post',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: sqlResult
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        }
+    })
+})
+app.get('/get_friends_status_requests', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {       
+        let sql = "call get_status_friend_requests(?);";
+        
+        con.query(sql,[req.session.uid],(err, sqlResult) => {
+            if (err) {
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Friends does not exist',
+                    reason: 'Friends_NOT_FOUND',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: {
+                        events: sqlResult
+                    }
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
+app.post('/send_request', (req, res) => {
+    let sql = "call send_friend_request(?,?);";
+    let vars = [req.session.uid,req.body.friendID];
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'USER_TAKEN'
+                })
+            } else {
+                console.error(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {
+            res.status(200).send({
+                body: 'success'
+            })
+        }
+    });
+})
+
+app.post('/accept_request', (req, res) => {
+    let sql = "call accept_friend_request(?,?);";
+    let vars = [req.session.uid,req.body.friendID];
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'USER_TAKEN'
+                })
+            } else {
+                console.error(err);
+				console.log(sql);
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {
+            res.status(200).send({
+                body: 'success'
+            })
+        }
+    });
+})
+app.post('/block_request', (req, res) => {
+    let sql = "call block_friend_request(?,?);";
+    let vars = [req.session.uid,req.body.friendID];
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'USER_TAKEN'
+                })
+            } else {
+                console.error(err);
+				console.log(sql);
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {
+            res.status(200).send({
+                body: 'success'
+            })
+        }
+    });
+})
+
+
 
 
 function isEmailValid(email) {
