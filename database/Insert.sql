@@ -51,7 +51,7 @@ insert into PostContent values (3, 2, 'text', 'Hello all.');
 insert into Posts values (3, 3, 2, '2019-04-5 10:00:00', 1);
 insert into PostContent values (4, 3, 'text', 'University Selection');
 
-insert into Photos values (1, 1, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/IMG_0203.CR2.jpg'));
+-- insert into Photos values (1, 1, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/IMG_0203.CR2.jpg'));
 
 insert into Comments values (1, 1, 1, "This is very good. Thanks", now());
 insert into Comments values (2, 2, 1, "Interesting", now());
@@ -72,12 +72,12 @@ insert into Posts values (6, 6, 1, now(), 3);
 insert into PostContent values (9, 6, 'text', 'Should go to Gracehopper conference');
 
 insert into Posts values (7, 5, 2, now(), 2);
-insert into PostContent values (7, 5, 'text', 'Did you do Db project');
+insert into PostContent values (8, 5, 'text', 'Did you do Db project');
 
 insert into Posts values (8, 3, 2, now(), 1);
 insert into PostContent values (10, 8, 'text', 'This is kiran');
 
-insert into Photos values (2, 4, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/IMG_0203.CR2.jpg'));
+-- insert into Photos values (2, 4, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/IMG_0203.CR2.jpg'));
 
 
 insert into events (location_id,Type,Event_date,timestamp,Title,Description)
@@ -177,27 +177,22 @@ insert into PostContent(post_id,content_type,content_data) values (20, 'text', '
 insert into Posts (user_id,location_id,timestamp,restriction_id) values (2, 2, now(), 7);
 insert into PostContent(post_id,content_type,content_data) values (21, 'text', 'Need help for survey');
 
-CID integer primary key auto_increment,
-    user_id integer not null references StudentAccount(UID),
-    post_id integer not null references Posts(PID),
-    text varchar(1000) not null,
-    timestamp datetime not null
 
 insert into Comments(user_id,post_id,text,timestamp)
 values(2,1,"Hello",now());
 
 insert into Comments(user_id,post_id,text,timestamp)
-values(2,3,"Yes",now())
+values(2,3,"Yes",now());
 insert into Comments(user_id,post_id,text,timestamp)
-values(3,4,"Interesting",now())
+values(3,4,"Interesting",now());
 insert into Comments(user_id,post_id,text,timestamp)
-values(2,7,"I am curious",now())
+values(2,7,"I am curious",now());
 insert into Comments(user_id,post_id,text,timestamp)
-values(7,8,"yeah",now())
+values(7,8,"yeah",now());
 insert into Comments(user_id,post_id,text,timestamp)
-values(5,4,"Hi",now())
+values(5,4,"Hi",now());
 insert into Comments(user_id,post_id,text,timestamp)
-values(3,2,"Interesting",now())
+values(3,2,"Interesting",now());
 
 
 

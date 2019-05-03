@@ -1,3 +1,4 @@
+drop procedure if exists get_friends;
 DELIMITER //
 Create PROCEDURE get_friends(IN id INT)
 BEGIN
@@ -16,8 +17,9 @@ where UR1.user_id = id and UR2.friend_id != id and UR2.status = 'friends';
 END//
 delimiter ;
 
---------------------------------
+-- --------------------------------
 
+drop procedure if exists get_post_content_latest;
 delimiter //
 create procedure get_post_content_latest(IN id int)
 BEGIN
@@ -42,7 +44,9 @@ where UR1.user_id = id and UR2.friend_id != id and UR2.status = 'friends')
 order by time;
 END //
 delimiter ;
---------------------------------------------
+-- --------------------------------------------
+
+drop procedure if exists get_post_user;
 delimiter //
 create procedure get_post_user(IN id int)
 BEGIN
@@ -58,7 +62,9 @@ where posts.user_id = id and posts.restriction_id in (1,2,3)
 order by time;
 END //
 delimiter ;
----------------------------------------------------------------
+-- ---------------------------------------------------------------
+
+drop procedure if exists get_group_posts;
 Delimiter //
 create procedure get_group_posts(IN group_id INT)
 begin
@@ -74,8 +80,9 @@ where r.group_id = group_id
 order by timestamp;
 end//
 delimiter ;
-------------------------------------------------------------
+-- ------------------------------------------------------------
 
+drop procedure if exists get_user_groups;
 delimiter //
 create procedure get_user_groups(IN id INT)
 begin
@@ -87,7 +94,9 @@ where s.UID = id
 order by g.Title;
 END//
 delimiter ;
---------------------------------------------------------------
+-- --------------------------------------------------------------
+
+drop procedure if exists get_groups_can_subscribe;
 delimiter //
 create procedure get_groups_can_subscribe(IN id INT)
 begin
@@ -99,7 +108,9 @@ order by g.Title;
 END//
 delimiter ;
 
---------------------------------------------------------------------------
+-- --------------------------------------------------------------------------
+
+drop procedure if exists get_direct_friends;
 delimiter //
 create procedure get_direct_friends(IN id INT)
 BEGIN
@@ -109,8 +120,10 @@ inner join studentprofile p on r.friend_id = p.UID
 inner join studentaccount sc on r.friend_id = sc.UID
 where user_id = id and status = 'friends';
 END//
-delimiter;
--------------------------------------------------
+delimiter ;
+-- -------------------------------------------------
+
+drop procedure if exists get_comments;
 delimiter //
 create procedure get_comments(IN id INT)
 BEGIN
@@ -120,7 +133,9 @@ inner join studentaccount on comments.user_id = studentaccount.UID
 where comments.post_id = id;
 END//
 delimiter ;
--------------------------------------------------------------
+-- -------------------------------------------------------------
+
+drop procedure if exists get_status_friend_requests;
 delimiter //
 create procedure get_status_friend_requests(IN id INT)
 BEGIN
@@ -130,7 +145,9 @@ inner join studentprofile p on r.friend_id = p.UID
 where r.status <> "friends" and r.user_id = id;
 end//
 delimiter ;
-------------------------------------------------------------
+-- ------------------------------------------------------------
+
+drop procedure if exists send_friend_request;
 delimiter //
 create procedure send_friend_request(IN uid int, IN fid int)
 BEGIN
@@ -138,7 +155,9 @@ insert into studentrelations values(uid,fid,"requested", now());
 insert into studentrelations values(fid,uid,"received",now());
 END//
 delimiter ;
---------------------------------------------------------
+-- --------------------------------------------------------
+
+drop procedure if exists accept_friend_request;
 delimiter //
 create procedure accept_friend_request(IN id int, IN fid int)
 BEGIN
@@ -146,7 +165,9 @@ update studentrelations set status = "friends", timestamp = now() where user_id 
 update studentrelations set status = "friends", timestamp = now() where user_id = fid and friend_id = id;
 END//
 delimiter ;
-------------------------------------------------------------
+-- ------------------------------------------------------------
+
+drop procedure if exists block_friend_request;
 delimiter //
 create procedure block_friend_request(IN id int, IN fid int)
 BEGIN
