@@ -24,7 +24,7 @@ delimiter //
 create procedure get_post_content_latest(IN id int)
 BEGIN
 select distinct posts.PID,posts.user_id,studentaccount.username,studentprofile.displayname,postcontent.content_type,postcontent.content_data,photos.photo,restrictions.type,location.name locationName,
-location.city,location.state,location.country,posts.timestamp time from posts 
+location.city,location.state,location.country,posts.title,posts.timestamp time from posts 
 inner join postcontent on posts.PID = postcontent.post_id 
 inner join studentprofile on posts.user_id = studentprofile.UID
 inner join studentaccount on posts.user_id = studentaccount.UID
@@ -50,8 +50,8 @@ drop procedure if exists get_post_user;
 delimiter //
 create procedure get_post_user(IN id int)
 BEGIN
-select posts.PID,posts.user_id,studentaccount.username,studentprofile.displayname,postcontent.content_type,postcontent.content_data,photos.photo,restrictions.type,location.name locationName,
-location.city,location.state,location.country,posts.timestamp time from posts 
+select distinct posts.PID,posts.user_id,studentaccount.username,studentprofile.displayname,postcontent.content_type,postcontent.content_data,photos.photo,restrictions.type,location.name locationName,
+location.city,location.state,location.country,posts.title,posts.timestamp time from posts 
 inner join postcontent on posts.PID = postcontent.post_id 
 inner join studentprofile on posts.user_id = studentprofile.UID
 inner join studentaccount on posts.user_id = studentaccount.UID
@@ -68,7 +68,7 @@ drop procedure if exists get_group_posts;
 Delimiter //
 create procedure get_group_posts(IN group_id INT)
 begin
-select p.PID,p.user_id,p.timestamp,p.restriction_id,G.content_type,G.content_data,ph.photo,l.name locationName,l.city,l.state,l.country,s.displayname,sc.username,r.type restrictionType,r.group_id,sg.Title grouptitle,sg.Description groupdesc from posts p 
+select p.PID,p.user_id,p.timestamp,p.restriction_id,p.title,G.content_type,G.content_data,ph.photo,l.name locationName,l.city,l.state,l.country,s.displayname,sc.username,r.type restrictionType,r.group_id,sg.Title grouptitle,sg.Description groupdesc from posts p 
 inner join postcontent G on p.PID = G.post_id
 left outer join photos ph on p.PID = ph.post_id
 inner join location l on p.location_id = l.LID
@@ -194,7 +194,7 @@ drop procedure if exists get_post_any_user_not_friend;
 delimiter //
 create procedure get_post_any_user_not_friend(IN id int)
 BEGIN
-select posts.PID,posts.user_id,studentaccount.username,studentprofile.displayname,postcontent.content_type,postcontent.content_data,photos.photo,restrictions.type,location.name locationName,
+select distinct posts.PID,posts.user_id,posts.title,studentaccount.username,studentprofile.displayname,postcontent.content_type,postcontent.content_data,photos.photo,restrictions.type,location.name locationName,
 location.city,location.state,location.country,posts.timestamp time from posts 
 inner join postcontent on posts.PID = postcontent.post_id 
 inner join studentprofile on posts.user_id = studentprofile.UID
@@ -206,6 +206,16 @@ where posts.user_id = id and posts.restriction_id =1
 order by time;
 END//
 delimiter;
+-------------------------------------------------------------------------
+delimiter //
+create procedure checkuseringroup(IN user_id int, IN group_id int)
+BEGIN
+declare isInGroup INT;
+select count(*) into isInGroup from studentgroup where studentgroup.GID = group_id and studentgroup.UID = user_id;
+if isInGroup >0 then call get_group_posts(group_id);
+end if;
+end//
+delimiter ;
 
 
 

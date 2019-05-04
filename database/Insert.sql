@@ -41,14 +41,14 @@ insert into Location values (3, 30.8734, 50.1210, 'Chipotle', 'San Francisco', '
 insert into Location values (4, 38.7128, 71.0060, 'Reading Market', 'Philadelphia', 'Pennsylvania', 'USA');
 insert into Location values (5, 40.7128, 74.0060, 'IKEA', 'New York City', 'New York', 'USA');
 
-insert into Posts values (1, 1, 1, '2019-04-5 10:00:00', 2);
+insert into Posts values (1, 1, 1, '2019-04-5 10:00:00', 2,"My first post");
 insert into PostContent values (1, 1, 'text', 'Hello Everyone. How are you? Please read my latest book.');
 insert into PostContent values (2, 1, 'pdf', 'https://www.blogpost.com/alex.pdf');
 
-insert into Posts values (2, 2, 2, '2019-04-5 10:00:00', 1);
+insert into Posts values (2, 2, 2, '2019-04-5 10:00:00', 1,"welcome post");
 insert into PostContent values (3, 2, 'text', 'Hello all.');
 
-insert into Posts values (3, 3, 2, '2019-04-5 10:00:00', 1);
+insert into Posts values (3, 3, 2, '2019-04-5 10:00:00', 1,"selection done");
 insert into PostContent values (4, 3, 'text', 'University Selection');
 
 -- insert into Photos values (1, 1, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/IMG_0203.CR2.jpg'));
@@ -62,19 +62,19 @@ insert into restrictions values(2,'private',null);
 insert into restrictions values(3,'friends-of-friends',null);
 
 
-insert into Posts values (4, 4, 2, now(), 1);
+insert into Posts values (4, 4, 2, now(), 1,"My first post");
 insert into PostContent values (6, 4, 'text', 'welcome to NYU!!');
 
-insert into Posts values (5, 5, 2, now(), 1);
+insert into Posts values (5, 5, 2, now(), 1,"Graduated");
 insert into PostContent values (7, 5, 'text', 'Graduated!!');
 
-insert into Posts values (6, 6, 1, now(), 3);
+insert into Posts values (6, 6, 1, now(), 3,"Conference");
 insert into PostContent values (9, 6, 'text', 'Should go to Gracehopper conference');
 
-insert into Posts values (7, 5, 2, now(), 2);
+insert into Posts values (7, 5, 2, now(), 2,"Project update");
 insert into PostContent values (8, 5, 'text', 'Did you do Db project');
 
-insert into Posts values (8, 3, 2, now(), 1);
+insert into Posts values (8, 3, 2, now(), 1,"Introduction");
 insert into PostContent values (10, 8, 'text', 'This is kiran');
 
 -- insert into Photos values (2, 4, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/IMG_0203.CR2.jpg'));
@@ -138,43 +138,43 @@ insert into restrictions(type,group_id) values("group", 300);
 insert into restrictions(type,group_id) values("group", 400);
 insert into restrictions(type,group_id) values("group", 500);
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (1, 2, now(), 4);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (1, 2, now(), 4, "Group");
 insert into PostContent(post_id,content_type,content_data) values (9, 'text', 'welcome to Group!!');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (2, 2, now(), 5);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (2, 2, now(), 5,"welcome");
 insert into PostContent(post_id,content_type,content_data) values (10, 'text', 'Hello!!');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (1, 2, now(), 5);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (1, 2, now(), 5,"update");
 insert into PostContent(post_id,content_type,content_data) values (11, 'text', 'back end is Node and front end is React');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (7, 2, now(), 6);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (7, 2, now(), 6,"kudos");
 insert into PostContent(post_id,content_type,content_data) values (12, 'text', 'Congrats');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (3, 2, now(), 6);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (3, 2, now(), 6,"Graduation");
 insert into PostContent(post_id,content_type,content_data) values (13, 'text', 'commencement on May 22');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (2, 2, now(), 6);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (2, 2, now(), 6,"Graduation");
 insert into PostContent(post_id,content_type,content_data) values (14, 'text', 'need commencement tickets of ALL NYU yankee stadium');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (1, 2, now(),7);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (1, 2, now(),7,"job");
 insert into PostContent(post_id,content_type,content_data) values (15, 'text', 'NYU IT oncampus job. Interested ping me!!');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (5, 2, now(), 7);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (5, 2, now(), 7,"job");
 insert into PostContent(post_id,content_type,content_data) values (16, 'text', 'Need Graduate Assistant in CS department front desk');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (8, 2, now(), 5);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (8, 2, now(), 5,"job");
 insert into PostContent(post_id,content_type,content_data) values (17, 'text', 'I set up the backend and some one should work on front end');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (4, 2, now(), 8);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (4, 2, now(), 8,"job");
 insert into PostContent(post_id,content_type,content_data) values (18, 'text', 'Google openings 2019. Apply on website');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (4, 2, now(), 7);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (4, 2, now(), 7,"job");
 insert into PostContent(post_id,content_type,content_data) values (19, 'text', 'Research assistantship in AI');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (3, 2, now(), 7);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (3, 2, now(), 7,"job");
 insert into PostContent(post_id,content_type,content_data) values (20, 'text', 'Graduate Assistant for NYU Graduates front desk');
 
-insert into Posts (user_id,location_id,timestamp,restriction_id) values (2, 2, now(), 7);
+insert into Posts (user_id,location_id,timestamp,restriction_id,title) values (2, 2, now(), 7,"survey");
 insert into PostContent(post_id,content_type,content_data) values (21, 'text', 'Need help for survey');
 
 

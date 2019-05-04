@@ -390,8 +390,9 @@ app.get('/get_events', (req, res) => {
 })
 
 app.post('/get_group_posts', (req, res) => {
-    let sql = "call get_group_posts(?);";
-    let vars = [req.body.groupID];
+    let sql = "call checkuseringroup(?,?);";
+	//let sql = "call get_group_posts(?);";
+    let vars = [req.session.uid,req.body.groupID];
     con.query(sql, vars, (err, sqlResult) => {
         if (err) {
             console.error(err)
@@ -400,18 +401,9 @@ app.post('/get_group_posts', (req, res) => {
                 reason: 'SERVER_ERROR'
             })
         } else {
-            if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Invalid GroupID',
-                    reason: 'INVALID_Group',
-                })
-            } else if (sqlResult.length > 0) {
-                res.status(200).send({
+            res.status(200).send({
                     body: sqlResult
                 })
-            } else {
-                new assert.AssertionError('Unique field cannot have 2 rows with same value');
-            }
         }
     })
 })
@@ -422,10 +414,17 @@ app.get('/get_user_groups', (req, res) => {
             body: 'Session expired',
             reason: 'SESSION_EXPIRED'
         })
-    } else {       
+    } else { 
+        	
         let sql = "call get_user_groups(?);";
+        let args;
+        if (req.body.userID) {        
+            args = [req.body.userID]
+        } else {       
+            args = [req.session.uid]
+        }
         
-        con.query(sql,[req.session.uid],(err, sqlResult) => {
+        con.query(sql,args,(err, sqlResult) => {
             if (err) {
                 res.status(500).send({
                     body: 'Internal server error',
@@ -457,8 +456,14 @@ app.get('/get_groups_can_subscribe', (req, res) => {
         })
     } else {       
         let sql = "call get_groups_can_subscribe(?);";
+		let args;
+        if (req.body.userID) {        
+            args = [req.body.userID]
+        } else {       
+            args = [req.session.uid]
+        }
         
-        con.query(sql,[req.session.uid],(err, sqlResult) => {
+        con.query(sql,args,(err, sqlResult) => {
             if (err) {
                 res.status(500).send({
                     body: 'Internal server error',
@@ -490,8 +495,14 @@ app.get('/get_direct_friends', (req, res) => {
         })
     } else {       
         let sql = "call get_direct_friends(?);";
+		let args;
+        if (req.body.userID) {        
+            args = [req.body.userID]
+        } else {       
+            args = [req.session.uid]
+        }
         
-        con.query(sql,[req.session.uid],(err, sqlResult) => {
+        con.query(sql,args,(err, sqlResult) => {
             if (err) {
                 res.status(500).send({
                     body: 'Internal server error',
@@ -523,8 +534,14 @@ app.get('/get_friends', (req, res) => {
         })
     } else {       
         let sql = "call get_friends(?);";
+		let args;
+        if (req.body.userID) {        
+            args = [req.body.userID]
+        } else {       
+            args = [req.session.uid]
+        }
         
-        con.query(sql,[req.session.uid],(err, sqlResult) => {
+        con.query(sql,args,(err, sqlResult) => {
             if (err) {
                 res.status(500).send({
                     body: 'Internal server error',
@@ -702,7 +719,7 @@ app.post('/add_event', (req, res) => {
             }
         } else {
             res.status(200).send({
-                body: 'success'
+                body: result
             })
         }
     });
@@ -727,7 +744,7 @@ app.post('/add_comment', (req, res) => {
             }
         } else {
             res.status(200).send({
-                body: 'success'
+                body: result
             })
         }
     });
@@ -752,7 +769,7 @@ app.post('/add_like', (req, res) => {
             }
         } else {
             res.status(200).send({
-                body: 'success'
+                body: result
             })
         }
     });
@@ -776,12 +793,37 @@ app.post('/add_group', (req, res) => {
             }
         } else {
             res.status(200).send({
-                body: 'success'
+                body: result
             })
         }
     });
 })
-
+app.post('/add_post', (req, res) => {
+    let sql = "insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(?,?,?,?,now());";
+    let vars = [req.session.uid, req.body.locationID, req.body.restrictionID,req.body.title];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {
+            console.log(result.insertId);		
+            res.status(200).send({
+				
+                body: result
+            })
+        }
+    });
+})
 
 
 
