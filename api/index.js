@@ -824,6 +824,140 @@ app.post('/add_post', (req, res) => {
         }
     });
 })
+app.post('/add_post_content', (req, res) => {
+    let sql = "insert into PostContent(post_id,content_type,content_data) values(?,?,?);";
+    let vars = [req.body.PostID, req.body.type,req.body.data];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {		
+            res.status(200).send({
+				
+                body: result
+            })
+        }
+    });
+})
+app.post('/add_location', (req, res) => {
+    let sql = "insert into location(latitude,longitude,name,city,state,country) values(?,?,?,?,?,?);";
+    let vars = [req.body.latitude,req.body.longitude,req.body.name,req.body.city,req.body.state,req.body.country];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {		
+            res.status(200).send({
+				
+                body: result
+            })
+        }
+    });
+})
+app.post('/search_location', (req, res) => {
+    let sql = "select LID,latitude,longitude,name,city,state,country from location where name like ?";
+    let vars = ["%"+req.body.locationName+"%"];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {		
+            res.status(200).send({
+				
+                body: result
+            })
+        }
+    });
+})
+app.post('/search_friends', (req, res) => {
+    let sql = "select s.UID,s.username,p.displayname,p.email,p.email,p.gender,p.age,p.city from studentaccount s inner join studentprofile p on s.UID = p.UID where s.username like ?";
+    let vars = ["%"+req.body.username+"%"];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {		
+            res.status(200).send({
+				
+                body: result
+            })
+        }
+    });
+})
+app.get('/search_post', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+		
+        let sql = "CALL search_post_content_latest(?,?);";
+        con.query(sql,[req.session.uid,"%"+req.body.title+"%"],(err, sqlResult) => {
+			
+            if (err) {
+				console.log(err);
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Posts does not exist',
+                    reason: 'PROFILE_NOT_FOUND',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: {
+						posts:sqlResult
+					}
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
 
 
 

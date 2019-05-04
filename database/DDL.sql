@@ -47,13 +47,15 @@ create table Location (
     country varchar(100)
 );
     
-
+ALTER TABLE posts
+  ADD title VARCHAR(50);
 drop table if exists Posts;
 create table Posts (
 	PID integer primary key auto_increment,
     user_id integer not null references StudentAccount(UID),
     location_id integer references Location(LID),
     timestamp datetime not null,
+	title varchar(50);
     restriction_id integer not null references restriction(RID)
     );
 
