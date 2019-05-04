@@ -958,6 +958,47 @@ app.get('/search_post', (req, res) => {
         })
     }
 })
+app.get('/get_like_count', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+		
+        let sql = "select count(*) likecount, posts.PID  from likes inner join posts on likes.post_id = posts.PID where posts.PID = ? group by posts.PID;";
+        con.query(sql,[req.body.postID],(err, sqlResult) => {
+			
+            if (err) {
+				console.log(err);
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: {
+						posts:[
+					      {
+						   "likecount": 0,
+						   "PID": req.body.postID
+					     }
+				        ]
+					}
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: {
+						posts:sqlResult
+					}
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
+
 
 
 
