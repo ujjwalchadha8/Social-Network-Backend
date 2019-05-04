@@ -875,7 +875,7 @@ app.post('/add_location', (req, res) => {
     });
 })
 app.post('/search_location', (req, res) => {
-    let sql = "select LID,latitude,longitude,name,city,state,country from location where name like ?";
+    let sql = "select LID,latitude,longitude,name,city,state,country from location where lower(name) like lower(?)";
     let vars = ["%"+req.body.locationName+"%"];    
     con.query(sql, vars, function (err, result) {
         if (err) {
@@ -893,7 +893,6 @@ app.post('/search_location', (req, res) => {
             }
         } else {		
             res.status(200).send({
-				
                 body: result
             })
         }
