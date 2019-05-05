@@ -324,3 +324,27 @@ where UR1.user_id = id and UR2.friend_id != id and UR2.status = 'friends')
 order by time;
 END //
 delimiter ;
+----------------------------------------------------------------
+delimiter //
+create function add_post(user_id int,restrictionId int,locationName varchar(50),title varchar(100))
+returns BIGINT
+BEGIN
+declare locationID varchar(50);
+select location.LID into locationID from location where location.name = locationName;
+insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(user_id,locationID,restrictionId,title,now());
+return LAST_INSERT_ID();
+end //
+delimiter ;
+------------------------------------------------------------------------
+delimiter //
+create function add_post_to_group_func(user_id int, group_id int,locationName varchar(50),title varchar(100))
+returns BIGINT
+BEGIN
+declare restrictionID int;
+declare locationID varchar(50);
+select rid into restrictionID from restrictions where restrictions.group_id = group_id;
+select location.LID into locationID from location where location.name = locationName;
+insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(user_id,locationID,restrictionID,title,now());
+return LAST_INSERT_ID();
+END //
+delimiter ;

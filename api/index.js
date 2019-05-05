@@ -4,7 +4,8 @@ const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const assert = require('assert');
-const cors = require('cors')
+const cors = require('cors');
+const fs = require("fs");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -798,9 +799,21 @@ app.post('/add_group', (req, res) => {
         }
     });
 })
+// To get PID , use body.ID
 app.post('/add_post', (req, res) => {
-    let sql = "insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(?,?,?,?,now());";
-    let vars = [req.session.uid, req.body.locationID, req.body.restrictionID,req.body.title];    
+	let sql;
+	let vars;
+	if(req.body.GroupID){
+	   sql = "select add_post_to_group_func(?,?,?,?) as ID;";
+       vars = [req.session.uid,req.body.GroupID, req.body.locationName, req.body.title];   
+		
+	}
+	else {
+		sql = "select add_post(?,?,?,?) as ID;";
+        vars = [req.session.uid,req.body.restrictionID, req.body.locationName, req.body.title]; 
+		
+	}
+    
     con.query(sql, vars, function (err, result) {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
@@ -898,7 +911,7 @@ app.post('/search_location', (req, res) => {
         }
     });
 })
-app.post('/search_friends', (req, res) => {
+app.get('/search_friends', (req, res) => {
     let sql = "select s.UID,s.username,p.displayname,p.email,p.email,p.gender,p.age,p.city from studentaccount s inner join studentprofile p on s.UID = p.UID where s.username like ?";
     let vars = ["%"+req.body.username+"%"];    
     con.query(sql, vars, function (err, result) {
@@ -996,6 +1009,32 @@ app.get('/get_like_count', (req, res) => {
             }
         })
     }
+})
+app.put('/add_image', (req, res) => {
+    let sql = "insert into Photos(post_id,photo) values (?, ?)";
+	let imagepath = fs.readFileSync(req.body.imagePath);
+    let vars = [req.body.postID,imagepath];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {		
+            res.status(200).send({
+				
+                body: result
+            })
+        }
+    });
 })
 
 

@@ -51,7 +51,7 @@ insert into PostContent values (3, 2, 'text', 'Hello all.');
 insert into Posts values (3, 3, 2, '2019-04-5 10:00:00', 1,"selection done");
 insert into PostContent values (4, 3, 'text', 'University Selection');
 
--- insert into Photos values (1, 1, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/IMG_0203.CR2.jpg'));
+-- insert into Photos values (1, 1, LOAD_FILE('/Users/ujjwalchadha/Documents/Pics/nyu.jpg'));
 
 insert into Comments values (1, 1, 1, "This is very good. Thanks", now());
 insert into Comments values (2, 2, 1, "Interesting", now());
