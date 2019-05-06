@@ -230,7 +230,7 @@ inner join studentaccount on posts.user_id = studentaccount.UID
 inner join restrictions on posts.restriction_id = restrictions.RID
 left outer join photos on posts.PID = photos.post_id
 left outer join location on posts.location_id = location.LID
-where posts.restriction_id in (1,3) and posts.title like word
+where posts.restriction_id in (1,3) and lower(posts.title) like (word)
 and posts.user_id in (
 select friend_id
 from studentrelations 
@@ -244,25 +244,23 @@ order by time;
 END //
 delimiter ;
 ----------------------------------------------------------------
+drop function if exists add_post;
 delimiter //
-create function add_post(user_id int,restrictionId int,locationName varchar(50),title varchar(100))
+create function add_post(user_id int,restrictionId int,locationID int,title varchar(100))
 returns BIGINT
 BEGIN
-declare locationID varchar(50);
-select location.LID into locationID from location where location.name = locationName;
 insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(user_id,locationID,restrictionId,title,now());
 return LAST_INSERT_ID();
 end //
 delimiter ;
 ------------------------------------------------------------------------
+drop function if exists add_post_to_group_func;
 delimiter //
-create function add_post_to_group_func(user_id int, group_id int,locationName varchar(50),title varchar(100))
+create function add_post_to_group_func(user_id int, group_id int,locationID int,title varchar(100))
 returns BIGINT
 BEGIN
 declare restrictionID int;
-declare locationID varchar(50);
 select rid into restrictionID from restrictions where restrictions.group_id = group_id;
-select location.LID into locationID from location where location.name = locationName;
 insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(user_id,locationID,restrictionID,title,now());
 return LAST_INSERT_ID();
 END //
@@ -276,7 +274,7 @@ select distinct s.UID,s.username,p.displayname,sg.GID,sg.timestamp,g.Title,g.Des
 inner join studentprofile p on s.UID = p.UID
 inner join studentgroup sg on sg.UID = s.UID
 inner join sgroups g on sg.GID = g.GID
-where s.UID = id and g.Title like word
+where s.UID = id and lower(g.Title) like lower(word)
 order by g.Title;
 END//
 delimiter ;

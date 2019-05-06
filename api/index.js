@@ -321,9 +321,9 @@ app.get('/get_posts_user', (req, res) => {
     } else {
 		let sql;
 		let vars;
-		if(req.body.userID){
+		if(req.query.userID){
 			sql = "call checkfriend(?,?);";
-			vars = [req.session.uid,req.body.userID]
+			vars = [req.session.uid,req.query.userID]
 		}
 		else {
 			sql = "CALL get_post_user(?);";
@@ -391,6 +391,12 @@ app.get('/get_events', (req, res) => {
 })
 
 app.post('/get_group_posts', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "call checkuseringroup(?,?);";
 	//let sql = "call get_group_posts(?);";
     let vars = [req.session.uid,req.body.groupID];
@@ -407,6 +413,7 @@ app.post('/get_group_posts', (req, res) => {
                 })
         }
     })
+	}
 })
 
 app.get('/get_user_groups', (req, res) => {
@@ -419,8 +426,8 @@ app.get('/get_user_groups', (req, res) => {
         	
         let sql = "call get_user_groups(?);";
         let args;
-        if (req.body.userID) {        
-            args = [req.body.userID]
+        if (req.query.userID) {        
+            args = [req.query.userID]
         } else {       
             args = [req.session.uid]
         }
@@ -458,8 +465,8 @@ app.get('/get_groups_can_subscribe', (req, res) => {
     } else {       
         let sql = "call get_groups_can_subscribe(?);";
 		let args;
-        if (req.body.userID) {        
-            args = [req.body.userID]
+        if (req.query.userID) {        
+            args = [req.query.userID]
         } else {       
             args = [req.session.uid]
         }
@@ -497,8 +504,8 @@ app.get('/get_direct_friends', (req, res) => {
     } else {       
         let sql = "call get_direct_friends(?);";
 		let args;
-        if (req.body.userID) {        
-            args = [req.body.userID]
+        if (req.query.userID) {        
+            args = [req.query.userID]
         } else {       
             args = [req.session.uid]
         }
@@ -536,8 +543,8 @@ app.get('/get_friends', (req, res) => {
     } else {       
         let sql = "call get_friends(?);";
 		let args;
-        if (req.body.userID) {        
-            args = [req.body.userID]
+        if (req.query.userID) {        
+            args = [req.query.userID]
         } else {       
             args = [req.session.uid]
         }
@@ -567,8 +574,14 @@ app.get('/get_friends', (req, res) => {
 })
 
 app.get('/get_comments', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "call get_comments(?);";
-    let vars = [req.body.postID];
+    let vars = [req.query.postID];
     con.query(sql, vars, (err, sqlResult) => {
         if (err) {
             console.error(err)
@@ -591,6 +604,7 @@ app.get('/get_comments', (req, res) => {
             }
         }
     })
+	}
 })
 
 app.get('/get_friends_status_requests', (req, res) => {
@@ -626,6 +640,12 @@ app.get('/get_friends_status_requests', (req, res) => {
     }
 })
 app.post('/send_request', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "call send_friend_request(?,?);";
     let vars = [req.session.uid,req.body.friendID];
     con.query(sql, vars, function (err, result) {
@@ -648,9 +668,16 @@ app.post('/send_request', (req, res) => {
             })
         }
     });
+	}
 })
 
 app.post('/accept_request', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "call accept_friend_request(?,?);";
     let vars = [req.session.uid,req.body.friendID];
     con.query(sql, vars, function (err, result) {
@@ -674,8 +701,15 @@ app.post('/accept_request', (req, res) => {
             })
         }
     });
+	}
 })
 app.post('/block_request', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "call block_friend_request(?,?);";
     let vars = [req.session.uid,req.body.friendID];
     con.query(sql, vars, function (err, result) {
@@ -699,9 +733,16 @@ app.post('/block_request', (req, res) => {
             })
         }
     });
+	}
 })
 
 app.post('/add_event', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "insert into events(Description,Event_date,location_id,Title,Type,timestamp) values(?,?,?,?,?,now())";
     let vars = [req.body.description, req.body.eventDate,req.body.locationID,req.body.title,req.body.type];    
     con.query(sql, vars, function (err, result) {
@@ -724,9 +765,16 @@ app.post('/add_event', (req, res) => {
             })
         }
     });
+	}
 })
 
 app.post('/add_comment', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "insert into Comments(user_id,post_id,text,timestamp) values(?,?,?,now())";
     let vars = [req.session.uid, req.body.postID,req.body.commentText];    
     con.query(sql, vars, function (err, result) {
@@ -749,9 +797,16 @@ app.post('/add_comment', (req, res) => {
             })
         }
     });
+	}
 })
 
 app.post('/add_like', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "insert into likes(user_id,post_id,timestamp) values(?,?,now())";
     let vars = [req.session.uid, req.body.postID];    
     con.query(sql, vars, function (err, result) {
@@ -774,8 +829,15 @@ app.post('/add_like', (req, res) => {
             })
         }
     });
+	}
 })
 app.post('/add_group', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "insert into SGroups(timestamp,Title,Description) values(?,?,now())";
     let vars = [req.session.uid, req.body.postID];    
     con.query(sql, vars, function (err, result) {
@@ -798,19 +860,26 @@ app.post('/add_group', (req, res) => {
             })
         }
     });
+	}
 })
 // To get PID , use body.ID
 app.post('/add_post', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
 	let sql;
 	let vars;
 	if(req.body.GroupID){
 	   sql = "select add_post_to_group_func(?,?,?,?) as ID;";
-       vars = [req.session.uid,req.body.GroupID, req.body.locationName, req.body.title];   
+       vars = [req.session.uid,req.body.GroupID, req.body.locationID, req.body.title];   
 		
 	}
 	else {
 		sql = "select add_post(?,?,?,?) as ID;";
-        vars = [req.session.uid,req.body.restrictionID, req.body.locationName, req.body.title]; 
+        vars = [req.session.uid,req.body.restrictionID, req.body.locationID, req.body.title]; 
 		
 	}
     
@@ -836,8 +905,15 @@ app.post('/add_post', (req, res) => {
             })
         }
     });
+	}
 })
 app.post('/add_post_content', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "insert into PostContent(post_id,content_type,content_data) values(?,?,?);";
     let vars = [req.body.PostID, req.body.type,req.body.data];    
     con.query(sql, vars, function (err, result) {
@@ -861,8 +937,15 @@ app.post('/add_post_content', (req, res) => {
             })
         }
     });
+	}
 })
 app.post('/add_location', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "insert into location(latitude,longitude,name,city,state,country) values(?,?,?,?,?,?);";
     let vars = [req.body.latitude,req.body.longitude,req.body.name,req.body.city,req.body.state,req.body.country];    
     con.query(sql, vars, function (err, result) {
@@ -886,10 +969,19 @@ app.post('/add_location', (req, res) => {
             })
         }
     });
+	}
 })
-app.post('/search_location', (req, res) => {
+app.get('/search_location', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "select LID,latitude,longitude,name,city,state,country from location where lower(name) like lower(?)";
-    let vars = ["%"+req.body.locationName+"%"];    
+	var locationName1 = req.query.locationName.replaceAll("%", "\\%");
+	var locationName = locationName1.replaceAll("_", "\\_");
+    let vars = ["%"+locationName+"%"];    
     con.query(sql, vars, function (err, result) {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
@@ -910,10 +1002,19 @@ app.post('/search_location', (req, res) => {
             })
         }
     });
+	}
 })
 app.get('/search_friends', (req, res) => {
-    let sql = "select s.UID,s.username,p.displayname,p.email,p.email,p.gender,p.age,p.city from studentaccount s inner join studentprofile p on s.UID = p.UID where s.username like ?";
-    let vars = ["%"+req.body.username+"%"];    
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+    let sql = "select s.UID,s.username,p.displayname,p.email,p.email,p.gender,p.age,p.city from studentaccount s inner join studentprofile p on s.UID = p.UID where lower(s.username) like lower(?)";
+    var userName1 = req.query.username.replaceAll("%", "\\%");
+	var userName = userName1.replaceAll("_", "\\_");
+	let vars = ["%"+userName+"%"];    
     con.query(sql, vars, function (err, result) {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
@@ -935,6 +1036,7 @@ app.get('/search_friends', (req, res) => {
             })
         }
     });
+	}
 })
 app.get('/search_post', (req, res) => {
     if (!req.session.uid) {
@@ -945,7 +1047,9 @@ app.get('/search_post', (req, res) => {
     } else {
 		
         let sql = "CALL search_post_content_latest(?,?);";
-        con.query(sql,[req.session.uid,"%"+req.body.title+"%"],(err, sqlResult) => {
+		var title1 = req.query.title.replaceAll("%", "\\%");
+	    var title = title1.replaceAll("_", "\\_");
+        con.query(sql,[req.session.uid,"%"+title+"%"],(err, sqlResult) => {
 			
             if (err) {
 				console.log(err);
@@ -979,7 +1083,9 @@ app.get('/search_groups', (req, res) => {
     } else {
 		
         let sql = "CALL search_groups(?,?);";
-        con.query(sql,[req.session.uid,"%"+req.body.title+"%"],(err, sqlResult) => {
+		var title1 = req.query.title.replaceAll("%", "\\%");
+	    var title = title1.replaceAll("_", "\\_");
+        con.query(sql,[req.session.uid,"%"+title+"%"],(err, sqlResult) => {
 			
             if (err) {
 				console.log(err);
@@ -1013,7 +1119,7 @@ app.get('/get_like_count', (req, res) => {
     } else {
 		
         let sql = "select count(*) likecount, posts.PID  from likes inner join posts on likes.post_id = posts.PID where posts.PID = ? group by posts.PID;";
-        con.query(sql,[req.body.postID],(err, sqlResult) => {
+        con.query(sql,[req.query.postID],(err, sqlResult) => {
 			
             if (err) {
 				console.log(err);
@@ -1045,6 +1151,12 @@ app.get('/get_like_count', (req, res) => {
     }
 })
 app.put('/add_image', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
     let sql = "insert into Photos(post_id,photo) values (?, ?)";
 	let imagepath = fs.readFileSync(req.body.imagePath);
     let vars = [req.body.postID,imagepath];    
@@ -1069,8 +1181,13 @@ app.put('/add_image', (req, res) => {
             })
         }
     });
+	}
 })
 
+String.prototype.replaceAll = function (find, replace) {
+    var str = this;
+    return str.replace(new RegExp(find.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), replace);
+};
 
 
 
