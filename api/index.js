@@ -1220,6 +1220,69 @@ app.get('/get_users_like_post', (req, res) => {
     }
 })
 
+app.post('/subscribe_to_group', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+	let vars = [req.session.uid,req.body.GroupID];
+	let sql = "insert into studentgroup(UID,GID,timestamp) values(?,?,now()); "
+	    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {
+            console.log(result.insertId);		
+            res.status(200).send({
+				
+                body: result
+            })
+        }
+    });
+	}
+})
+app.get('/unsubscribe_group', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+		
+        let sql = "delete from studentgroup where UID = ? and GID = ?";
+        con.query(sql,[req.session.uid,req.query.groupID],(err, sqlResult) => {
+			
+            if (err) {
+				
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            
+        } else {		
+            res.status(200).send({
+				
+                body: sqlResult
+            })
+        }
+        })
+    }
+})
+
 String.prototype.replaceAll = function (find, replace) {
     var str = this;
     return str.replace(new RegExp(find.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), replace);
