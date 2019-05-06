@@ -267,6 +267,19 @@ insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(us
 return LAST_INSERT_ID();
 END //
 delimiter ;
+---------------------------------------------------------------------------------------
+drop procedure if exists search_groups;
+delimiter //
+create procedure search_groups(IN id int,IN word varchar(50))
+begin
+select distinct s.UID,s.username,p.displayname,sg.GID,sg.timestamp,g.Title,g.Description FROM studentaccount s
+inner join studentprofile p on s.UID = p.UID
+inner join studentgroup sg on sg.UID = s.UID
+inner join sgroups g on sg.GID = g.GID
+where s.UID = id and g.Title like word
+order by g.Title;
+END//
+delimiter ;
 
 
 
