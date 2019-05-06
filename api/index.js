@@ -1128,7 +1128,7 @@ app.get('/get_like_count', (req, res) => {
                     reason: 'SERVER_ERROR',
                 })
             } else if (sqlResult.length == 0) {
-                res.status(500).send({
+                res.status(200).send({
                     body: {
 						posts:[
 					      {
