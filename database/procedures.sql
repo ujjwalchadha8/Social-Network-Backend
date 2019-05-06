@@ -278,6 +278,15 @@ where s.UID = id and lower(g.Title) like lower(word)
 order by g.Title;
 END//
 delimiter ;
+------------------------------------------------------------------------------------------
+delimiter //
+create procedure remove_group(IN groupID INT)
+BEGIN
+DELETE from sgroups where gid = groupID; 
+DELETE from studentgroup where gid = groupID; 
+DELETE from restrictions where group_id = groupID;
+END //
+delimiter ;
 
 
 

@@ -1183,6 +1183,68 @@ app.put('/add_image', (req, res) => {
     });
 	}
 })
+app.get('/remove_group', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+		
+        let sql = "call remove_group(?);";
+        con.query(sql,[req.query.groupID,req.query.groupID,req.query.groupID],(err, sqlResult) => {
+			
+            if (err) {
+				
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            
+        } else {		
+            res.status(200).send({
+				
+                body: sqlResult
+            })
+        }
+        })
+    }
+})
+app.get('/get_group_details', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+		
+        let sql = "select GID,Description,timestamp,title from sgroups where GID = ?";
+        con.query(sql,[req.query.groupID],(err, sqlResult) => {
+			
+            if (err) {
+				console.log(err);
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else if (sqlResult.length == 0) {
+                res.status(500).send({
+                    body: 'Posts does not exist',
+                    reason: 'PROFILE_NOT_FOUND',
+                })
+            } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: {
+						events:sqlResult
+					}
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
 
 String.prototype.replaceAll = function (find, replace) {
     var str = this;
