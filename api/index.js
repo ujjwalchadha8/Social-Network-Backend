@@ -294,12 +294,7 @@ app.get('/get_post_content', (req, res) => {
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
                 })
-            } else if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Posts does not exist',
-                    reason: 'PROFILE_NOT_FOUND',
-                })
-            } else if (sqlResult.length > 0) {
+            } else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
 						posts:sqlResult
@@ -339,12 +334,7 @@ app.get('/get_posts_user', (req, res) => {
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
                 })
-            } else if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Posts does not exist',
-                    reason: 'PROFILE_NOT_FOUND',
-                })
-            } else if (sqlResult.length > 0) {
+            } else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
 						posts:sqlResult
@@ -372,12 +362,7 @@ app.get('/get_events', (req, res) => {
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
                 })
-            } else if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Events does not exist',
-                    reason: 'Evnets_NOT_FOUND',
-                })
-            } else if (sqlResult.length > 0) {
+            } else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
                         events: sqlResult
@@ -438,12 +423,7 @@ app.get('/get_user_groups', (req, res) => {
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
                 })
-            } else if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Events does not exist',
-                    reason: 'Evnets_NOT_FOUND',
-                })
-            } else if (sqlResult.length > 0) {
+            } else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
                         events: sqlResult
@@ -477,12 +457,7 @@ app.get('/get_groups_can_subscribe', (req, res) => {
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
                 })
-            } else if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Events does not exist',
-                    reason: 'Evnets_NOT_FOUND',
-                })
-            } else if (sqlResult.length > 0) {
+            } else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
                         events: sqlResult
@@ -516,12 +491,7 @@ app.get('/get_direct_friends', (req, res) => {
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
                 })
-            } else if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Friends does not exist',
-                    reason: 'Friends_NOT_FOUND',
-                })
-            } else if (sqlResult.length > 0) {
+            } else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
                         events: sqlResult
@@ -555,12 +525,7 @@ app.get('/get_friends', (req, res) => {
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
                 })
-            } else if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Friends does not exist',
-                    reason: 'Friends_NOT_FOUND',
-                })
-            } else if (sqlResult.length > 0) {
+            } else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
                         events: sqlResult
@@ -590,12 +555,7 @@ app.get('/get_comments', (req, res) => {
                 reason: 'SERVER_ERROR'
             })
         } else {
-            if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Invalid postID',
-                    reason: 'INVALID_post',
-                })
-            } else if (sqlResult.length > 0) {
+            if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: sqlResult
                 })
@@ -622,12 +582,7 @@ app.get('/get_friends_status_requests', (req, res) => {
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
                 })
-            } else if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Friends does not exist',
-                    reason: 'Friends_NOT_FOUND',
-                })
-            } else if (sqlResult.length > 0) {
+            }else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
                         events: sqlResult
@@ -1057,12 +1012,7 @@ app.get('/search_post', (req, res) => {
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
                 })
-            } else if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Posts does not exist',
-                    reason: 'PROFILE_NOT_FOUND',
-                })
-            } else if (sqlResult.length > 0) {
+            } else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
 						posts:sqlResult
@@ -1093,12 +1043,7 @@ app.get('/search_groups', (req, res) => {
                     body: 'Internal server error',
                     reason: 'SERVER_ERROR',
                 })
-            } else if (sqlResult.length == 0) {
-                res.status(500).send({
-                    body: 'Posts does not exist',
-                    reason: 'PROFILE_NOT_FOUND',
-                })
-            } else if (sqlResult.length > 0) {
+            } else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
 						events:sqlResult
@@ -1219,7 +1164,7 @@ app.get('/get_group_details', (req, res) => {
         })
     } else {
 		
-        let sql = "select GID,Description,timestamp,title from sgroups where GID = ?";
+        let sql = "select GID,Description,timestamp,Title from sgroups where GID = ?";
         con.query(sql,[req.query.groupID],(err, sqlResult) => {
 			
             if (err) {
@@ -1234,6 +1179,35 @@ app.get('/get_group_details', (req, res) => {
                     reason: 'PROFILE_NOT_FOUND',
                 })
             } else if (sqlResult.length > 0) {
+                res.status(200).send({
+                    body: {
+						events:sqlResult
+					}
+                })
+            } else {
+                new assert.AssertionError('Unique field cannot have 2 rows with same value');
+            }
+        })
+    }
+})
+app.get('/get_users_like_post', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+		
+        let sql = "select likes.user_id,likes.post_id,likes.timestamp,studentprofile.displayname,studentaccount.username from likes inner join studentprofile on likes.user_id = studentprofile.UID inner join studentaccount on likes.user_id = studentaccount.UID where likes.post_id = ?";
+        con.query(sql,[req.query.postID],(err, sqlResult) => {
+			
+            if (err) {
+				console.log(err);
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            }else if (sqlResult.length >= 0) {
                 res.status(200).send({
                     body: {
 						events:sqlResult
