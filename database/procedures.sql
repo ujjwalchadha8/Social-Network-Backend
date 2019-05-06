@@ -216,6 +216,57 @@ if isInGroup >0 then call get_group_posts(group_id);
 end if;
 end//
 delimiter ;
+-----------------------------------------------------------------------
+
+drop procedure if exists search_post_content_latest;
+delimiter //
+create procedure search_post_content_latest(IN id int,IN word varchar(50))
+BEGIN
+select distinct posts.PID,posts.user_id,studentaccount.username,studentprofile.displayname,postcontent.content_type,postcontent.content_data,photos.photo,restrictions.type,location.name locationName,
+location.city,location.state,location.country,posts.title,posts.timestamp time from posts 
+inner join postcontent on posts.PID = postcontent.post_id 
+inner join studentprofile on posts.user_id = studentprofile.UID
+inner join studentaccount on posts.user_id = studentaccount.UID
+inner join restrictions on posts.restriction_id = restrictions.RID
+left outer join photos on posts.PID = photos.post_id
+left outer join location on posts.location_id = location.LID
+where posts.restriction_id in (1,3) and posts.title like word
+and posts.user_id in (
+select friend_id
+from studentrelations 
+where user_id = id and status = 'friends'
+union
+select distinct UR2.friend_id
+from studentrelations UR1 inner join studentrelations UR2 
+on UR1.friend_id = UR2.user_id
+where UR1.user_id = id and UR2.friend_id != id and UR2.status = 'friends')
+order by time;
+END //
+delimiter ;
+----------------------------------------------------------------
+delimiter //
+create function add_post(user_id int,restrictionId int,locationName varchar(50),title varchar(100))
+returns BIGINT
+BEGIN
+declare locationID varchar(50);
+select location.LID into locationID from location where location.name = locationName;
+insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(user_id,locationID,restrictionId,title,now());
+return LAST_INSERT_ID();
+end //
+delimiter ;
+------------------------------------------------------------------------
+delimiter //
+create function add_post_to_group_func(user_id int, group_id int,locationName varchar(50),title varchar(100))
+returns BIGINT
+BEGIN
+declare restrictionID int;
+declare locationID varchar(50);
+select rid into restrictionID from restrictions where restrictions.group_id = group_id;
+select location.LID into locationID from location where location.name = locationName;
+insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(user_id,locationID,restrictionID,title,now());
+return LAST_INSERT_ID();
+END //
+delimiter ;
 
 
 
@@ -299,52 +350,3 @@ inner join studentprofile on posts.user_id = studentprofile.UID
 left outer join photos on posts.PID = photos.post_id
 ----------------------------------------------------------
 
-drop procedure if exists search_post_content_latest;
-delimiter //
-create procedure search_post_content_latest(IN id int,IN word varchar(50))
-BEGIN
-select distinct posts.PID,posts.user_id,studentaccount.username,studentprofile.displayname,postcontent.content_type,postcontent.content_data,photos.photo,restrictions.type,location.name locationName,
-location.city,location.state,location.country,posts.title,posts.timestamp time from posts 
-inner join postcontent on posts.PID = postcontent.post_id 
-inner join studentprofile on posts.user_id = studentprofile.UID
-inner join studentaccount on posts.user_id = studentaccount.UID
-inner join restrictions on posts.restriction_id = restrictions.RID
-left outer join photos on posts.PID = photos.post_id
-left outer join location on posts.location_id = location.LID
-where posts.restriction_id in (1,3) and posts.title like word
-and posts.user_id in (
-select friend_id
-from studentrelations 
-where user_id = id and status = 'friends'
-union
-select distinct UR2.friend_id
-from studentrelations UR1 inner join studentrelations UR2 
-on UR1.friend_id = UR2.user_id
-where UR1.user_id = id and UR2.friend_id != id and UR2.status = 'friends')
-order by time;
-END //
-delimiter ;
-----------------------------------------------------------------
-delimiter //
-create function add_post(user_id int,restrictionId int,locationName varchar(50),title varchar(100))
-returns BIGINT
-BEGIN
-declare locationID varchar(50);
-select location.LID into locationID from location where location.name = locationName;
-insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(user_id,locationID,restrictionId,title,now());
-return LAST_INSERT_ID();
-end //
-delimiter ;
-------------------------------------------------------------------------
-delimiter //
-create function add_post_to_group_func(user_id int, group_id int,locationName varchar(50),title varchar(100))
-returns BIGINT
-BEGIN
-declare restrictionID int;
-declare locationID varchar(50);
-select rid into restrictionID from restrictions where restrictions.group_id = group_id;
-select location.LID into locationID from location where location.name = locationName;
-insert into Posts (user_id,location_id,restriction_id,title,timestamp) values(user_id,locationID,restrictionID,title,now());
-return LAST_INSERT_ID();
-END //
-delimiter ;
