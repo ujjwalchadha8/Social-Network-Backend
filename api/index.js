@@ -966,10 +966,10 @@ app.get('/search_friends', (req, res) => {
             reason: 'SESSION_EXPIRED'
         })
     } else {
-    let sql = "select s.UID,s.username,p.displayname,p.email,p.email,p.gender,p.age,p.city from studentaccount s inner join studentprofile p on s.UID = p.UID where lower(s.username) like lower(?)";
+    let sql = "select distinct r.friend_id ,p.displayname,sc.username from studentrelations r inner join studentprofile p on r.friend_id = p.UID inner join studentaccount sc on r.friend_id = sc.UID where user_id = ? and status = 'friends' and lower(sc.username) like lower(?)";
     var userName1 = req.query.username.replaceAll("%", "\\%");
 	var userName = userName1.replaceAll("_", "\\_");
-	let vars = ["%"+userName+"%"];    
+	let vars = [req.session.uid,"%"+userName+"%"];    
     con.query(sql, vars, function (err, result) {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
@@ -1281,6 +1281,41 @@ app.get('/unsubscribe_group', (req, res) => {
         }
         })
     }
+})
+
+app.get('/search_users', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+    let sql = "select s.UID,s.username,p.displayname,p.email,p.email,p.gender,p.age,p.city from studentaccount s inner join studentprofile p on s.UID = p.UID where lower(s.username) like lower(?)";
+    var userName1 = req.query.username.replaceAll("%", "\\%");
+	var userName = userName1.replaceAll("_", "\\_");
+	let vars = ["%"+userName+"%"];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {		
+            res.status(200).send({
+				
+                body: result
+            })
+        }
+    });
+	}
 })
 
 String.prototype.replaceAll = function (find, replace) {
