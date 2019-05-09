@@ -6,6 +6,7 @@ const session = require('express-session');
 const assert = require('assert');
 const cors = require('cors');
 const fs = require("fs");
+const fileUpload = require('express-fileupload');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -13,7 +14,12 @@ app.use(session({ secret: 'keyboard cat', cookie: { secure: false, httpOnly: fal
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
-  }))
+}));
+
+app.use(fileUpload({
+    useTempFiles : true,
+    tempFileDir : '/tmp/'
+}));
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -187,13 +193,6 @@ app.post('/create-profile', (req, res) => {
 app.post('/register', (req, res) => {
     let sql = "insert into StudentAccount(username, password) values(?, ?)";
     let vars = [req.body.username, req.body.password];
-    if (!isEmailValid(req.body.username)) {
-        res.status(500).send({
-            body: 'Invalid Email',
-            reason: 'INVALID_EMAIL'
-        });
-        return;
-    }
     con.query(sql, vars, function (err, result) {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
@@ -215,6 +214,7 @@ app.post('/register', (req, res) => {
         }
     });
 })
+
 
 app.post('/login', (req, res) => {
     let sql = "select UID, username, password from StudentAccount where username = ? and password = ?";
@@ -1095,37 +1095,91 @@ app.get('/get_like_count', (req, res) => {
         })
     }
 })
-app.put('/add_image', (req, res) => {
+
+app.post('/upload-post', function(req, res) {
+    console.log(req.body);
+    console.log(req.files);
+
+    //postContent contains the content_data. content_type is always 'text'
+    let vars = [req.body.postTitle, req.body.postLocationId, req.body.postContent, req.body.postRestrictionId]
+    
+
+    //CREATE PHOTO ONLY IF IMAGE IS PRESENT
+    if (req.files.sampleFile) {
+        let sampleFile = req.files.sampleFile;
+        sampleFile.mv('bucket/'+sampleFile.name, function(err) {
+            if (err) {
+                console.error(err);
+            }
+        })
+        //STORE THIS FILE AT PATH IN BLOB
+        let imagePath = req.files.sampleFile.tempFilePath;
+        
+    }
+
+
+    //ALWAYS SEND THIS AS THE SUCCESS RESPONSE:
+    res.status(200).send(`
+        <p>File Uploaded! Redirecting.</p>
+        <script type="text/javascript">
+            window.location.href = 'http://localhost:3000/'
+        </script>
+    `);
+    
+    
+    // console.log(sampleFile);
+    // 
+        
+    // });
+});
+
+app.use(fileUpload());
+
+app.post('/add_image', (req, res) => {
 	if (!req.session.uid) {
         res.status(500).send({
             body: 'Session expired',
             reason: 'SESSION_EXPIRED'
         })
     } else {
-    let sql = "insert into Photos(post_id,photo) values (?, ?)";
-	let imagepath = fs.readFileSync(req.body.imagePath);
-    let vars = [req.body.postID,imagepath];    
-    con.query(sql, vars, function (err, result) {
-        if (err) {
-            if (err.code === 'ER_DUP_ENTRY') {
-                res.status(500).send({
-                    body: 'Couldn`t proceed with request',
-                    reason: 'Event_TAKEN'
-                })
-            } else {
-                console.log(err)
-                res.status(500).send({
-                    body: 'Couldn`t proceed with request',
-                    reason: 'SERVER_ERROR'
+        if (Object.keys(req.files).length == 0) {
+            return res.status(400).send('No files were uploaded.');
+        }
+        let sampleFile = req.files.sampleFile;
+        // Use the mv() method to place the file somewhere on your server
+        sampleFile.mv('filename.png', function(err) {
+            if (err)
+            return res.status(500).send(err);
+
+            res.send('File uploaded!');
+        });
+        if (!req.body.imagePath) {
+            res.status(200).send({hi: "hi"}); return;
+        }
+        let sql = "insert into Photos(post_id,photo) values (?, ?)";
+        let imagepath = fs.readFileSync(req.body.imagePath);
+        let vars = [req.body.postID,imagepath];    
+        con.query(sql, vars, function (err, result) {
+            if (err) {
+                if (err.code === 'ER_DUP_ENTRY') {
+                    res.status(500).send({
+                        body: 'Couldn`t proceed with request',
+                        reason: 'Event_TAKEN'
+                    })
+                } else {
+                    console.log(err)
+                    res.status(500).send({
+                        body: 'Couldn`t proceed with request',
+                        reason: 'SERVER_ERROR'
+                    })
+                }
+            } else {		
+                res.status(200).send({
+                    
+                    body: result
                 })
             }
-        } else {		
-            res.status(200).send({
-				
-                body: result
-            })
-        }
-    });
+        });
 	}
 })
 app.get('/remove_group', (req, res) => {
