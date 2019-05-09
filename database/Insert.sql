@@ -194,6 +194,8 @@ values(5,4,"Hi",now());
 insert into Comments(user_id,post_id,text,timestamp)
 values(3,2,"Interesting",now());
 
+UPDATE studentaccount SET password = MD5(password);
+
 
 
 

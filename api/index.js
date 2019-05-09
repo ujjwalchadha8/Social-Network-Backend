@@ -191,7 +191,7 @@ app.post('/create-profile', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-    let sql = "insert into StudentAccount(username, password) values(?, ?)";
+    let sql = "insert into StudentAccount(username, password) values(?, MD5(?))";
     let vars = [req.body.username, req.body.password];
     con.query(sql, vars, function (err, result) {
         if (err) {
@@ -217,7 +217,7 @@ app.post('/register', (req, res) => {
 
 
 app.post('/login', (req, res) => {
-    let sql = "select UID, username, password from StudentAccount where username = ? and password = ?";
+    let sql = "select UID, username, password from StudentAccount where username = ? and password = MD5(?)";
     let vars = [req.body.username, req.body.password];
     con.query(sql, vars, (err, sqlResult) => {
         if (err) {
