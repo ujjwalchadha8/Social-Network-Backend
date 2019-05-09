@@ -785,7 +785,40 @@ app.post('/add_like', (req, res) => {
         }
     });
 	}
-})
+});
+
+app.post('/delete_like', (req, res) => {
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+    let sql = "delete from likes where user_id = ? and post_id = ?";
+    let vars = [req.session.uid, req.body.postID];    
+    con.query(sql, vars, function (err, result) {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'Event_TAKEN'
+                })
+            } else {
+                console.error(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            }
+        } else {
+            res.status(200).send({
+                body: result
+            })
+        }
+    });
+	}
+});
+
 app.post('/add_group', (req, res) => {
 	if (!req.session.uid) {
         res.status(500).send({
@@ -1262,9 +1295,16 @@ app.get('/get_users_like_post', (req, res) => {
                     reason: 'SERVER_ERROR',
                 })
             }else if (sqlResult.length >= 0) {
+                let isLiked = false;
+                sqlResult.forEach(user => {
+                    if (user.user_id === req.session.uid) {
+                        isLiked = true
+                    }
+                });
                 res.status(200).send({
                     body: {
-						events:sqlResult
+                        users: sqlResult,
+                        isLiked: isLiked
 					}
                 })
             } else {
