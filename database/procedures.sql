@@ -308,6 +308,30 @@ End if;
  
 end //
 delimiter ;
+--------------------------------------------------------------------------
+drop function if exists upload_post;
+delimiter //
+create function upload_post(user_id int,locationID int,restrictionID int,groupID int,title varchar(50),type varchar(20),content longtext,imagePath blob)
+returns BIGINT
+BEGIN
+declare id INT;
+if(groupID is null) then 
+  select add_post(user_id,restrictionID,locationID,title) as ID into ID;
+else   
+  select add_post_to_group_func(user_id,groupID,locationID,title) as ID into ID;
+End if;
+
+if(content is not null and type is not null) then 
+insert into PostContent(post_id,content_type,content_data) values(id,type,content);
+End if;
+if(imagePath is not null) then
+insert into Photos(post_id,photo) values (id, imagePath);
+End if;
+return id;
+ 
+end //
+delimiter ;
+
 
 
 

@@ -1137,8 +1137,8 @@ app.post('/upload-post', function(req, res) {
             reason: 'SESSION_EXPIRED'
         })
     } else {	
-        let imagePath;	
-        console.log(req.files.sampleFile)
+        let imagePath;
+		let postID;
         //CREATE PHOTO ONLY IF IMAGE IS PRESENT
 		if (req.files) {
 			let sampleFile = req.files.sampleFile;
@@ -1155,7 +1155,7 @@ app.post('/upload-post', function(req, res) {
 		//postContent contains the content_data. content_type is always 'text'
         let vars = [req.session.uid,req.body.postLocationId,req.body.postRestrictionId,req.body.groupId,req.body.postTitle,contentType,req.body.postContent,imagePath]
 		
-        let sql = "call upload_post(?,?,?,?,?,?,?,?);";
+        let sql = "select upload_post(?,?,?,?,?,?,?,?) as id";
         con.query(sql,vars,(err, sqlResult) => {
 			
             if (err) {
@@ -1166,8 +1166,10 @@ app.post('/upload-post', function(req, res) {
                 })
             } else {
                 //ALWAYS SEND THIS AS THE SUCCESS RESPONSE:
-    				
-                res.status(200).send(`
+    			postID = sqlResult[0]["id"];	
+				console.log(postID);
+                res.status(200).send(
+				`
 						<p>File Uploaded! Redirecting.</p>
 						<script type="text/javascript">
 							window.location.href = 'http://localhost:3000/'
