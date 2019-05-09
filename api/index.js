@@ -316,7 +316,7 @@ app.get('/get_posts_user', (req, res) => {
     } else {
 		let sql;
 		let vars;
-		if(req.query.userID){
+		if(req.query.userID && req.query.userID != req.session.uid){
 			sql = "call checkfriend(?,?);";
 			vars = [req.session.uid,req.query.userID]
 		}
@@ -1138,7 +1138,7 @@ app.post('/upload-post', function(req, res) {
         })
     } else {	
         let imagePath;	
-
+        console.log(req.files.sampleFile)
         //CREATE PHOTO ONLY IF IMAGE IS PRESENT
 		if (req.files) {
 			let sampleFile = req.files.sampleFile;
