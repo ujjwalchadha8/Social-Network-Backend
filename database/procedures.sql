@@ -287,6 +287,27 @@ DELETE from studentgroup where gid = groupID;
 DELETE from restrictions where group_id = groupID;
 END //
 delimiter ;
+-----------------------------------------------
+drop procedure if exists upload_post;
+delimiter //
+create procedure upload_post(IN user_id int,IN locationID int,IN restrictionID int, IN groupID int, IN title varchar(50), IN type varchar(20),IN content longtext, IN imagePath blob)
+BEGIN
+declare id INT;
+if(groupID is null) then 
+  select add_post(user_id,restrictionID,locationID,title) as ID into ID;
+else   
+  select add_post_to_group_func(user_id,groupID,locationID,title) as ID into ID;
+End if;
+
+if(content is not null and type is not null) then 
+insert into PostContent(post_id,content_type,content_data) values(id,type,content);
+End if;
+if(imagePath is not null) then
+insert into Photos(post_id,photo) values (id, imagePath);
+End if;
+ 
+end //
+delimiter ;
 
 
 

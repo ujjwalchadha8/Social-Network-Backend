@@ -1130,40 +1130,52 @@ app.get('/get_like_count', (req, res) => {
 })
 
 app.post('/upload-post', function(req, res) {
-    console.log(req.body);
-    console.log(req.files);
+	
+	if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {	
+        let imagePath;	
 
-    //postContent contains the content_data. content_type is always 'text'
-    let vars = [req.body.postTitle, req.body.postLocationId, req.body.postContent, req.body.postRestrictionId]
-    
-
-    //CREATE PHOTO ONLY IF IMAGE IS PRESENT
-    if (req.files.sampleFile) {
-        let sampleFile = req.files.sampleFile;
-        sampleFile.mv('bucket/'+sampleFile.name, function(err) {
+        //CREATE PHOTO ONLY IF IMAGE IS PRESENT
+		if (req.files) {
+			let sampleFile = req.files.sampleFile;
+			sampleFile.mv('bucket/'+sampleFile.name, function(err) {
+				if (err) {
+					console.error(err);
+				}
+			})
+			//STORE THIS FILE AT PATH IN BLOB
+			imagePath = req.files.sampleFile.tempFilePath;
+			
+		}
+		let contentType = "text";
+		//postContent contains the content_data. content_type is always 'text'
+        let vars = [req.session.uid,req.body.postLocationId,req.body.postRestrictionId,req.body.groupId,req.body.postTitle,contentType,req.body.postContent,imagePath]
+		
+        let sql = "call upload_post(?,?,?,?,?,?,?,?);";
+        con.query(sql,vars,(err, sqlResult) => {
+			
             if (err) {
-                console.error(err);
+				console.log(err);
+                res.status(500).send({
+                    body: 'Internal server error',
+                    reason: 'SERVER_ERROR',
+                })
+            } else {
+                //ALWAYS SEND THIS AS THE SUCCESS RESPONSE:
+    				
+                res.status(200).send(`
+						<p>File Uploaded! Redirecting.</p>
+						<script type="text/javascript">
+							window.location.href = 'http://localhost:3000/'
+						</script>
+					`);
             }
         })
-        //STORE THIS FILE AT PATH IN BLOB
-        let imagePath = req.files.sampleFile.tempFilePath;
-        
-    }
-
-
-    //ALWAYS SEND THIS AS THE SUCCESS RESPONSE:
-    res.status(200).send(`
-        <p>File Uploaded! Redirecting.</p>
-        <script type="text/javascript">
-            window.location.href = 'http://localhost:3000/'
-        </script>
-    `);
-    
-    
-    // console.log(sampleFile);
-    // 
-        
-    // });
+    } 
 });
 
 app.use(fileUpload());
