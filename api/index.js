@@ -1141,20 +1141,18 @@ app.post('/upload-post', function(req, res) {
 		let postID;
         //CREATE PHOTO ONLY IF IMAGE IS PRESENT
 		if (req.files) {
-			let sampleFile = req.files.sampleFile;
-			sampleFile.mv('bucket/'+sampleFile.name, function(err) {
-				if (err) {
-					console.error(err);
-				}
-			})
 			//STORE THIS FILE AT PATH IN BLOB
-			imagePath = req.files.sampleFile.tempFilePath;
-			
+			imagePath = req.files.sampleFile.tempFilePath;			
 		}
-		let contentType = "text";
+        let contentType = "text";
+
 		//postContent contains the content_data. content_type is always 'text'
-        let vars = [req.session.uid,req.body.postLocationId,req.body.postRestrictionId,req.body.groupId,req.body.postTitle,contentType,req.body.postContent,imagePath]
-		
+        let vars = [req.session.uid,req.body.postLocationId,
+                            req.body.postRestrictionId ? req.body.postRestrictionId : null,
+                            req.body.groupId ? req.body.groupID : null,
+                            req.body.postTitle,contentType,req.body.postContent,imagePath]
+        console.log(vars);
+        
         let sql = "select upload_post(?,?,?,?,?,?,?,?) as id";
         con.query(sql,vars,(err, sqlResult) => {
 			
@@ -1167,9 +1165,18 @@ app.post('/upload-post', function(req, res) {
             } else {
                 //ALWAYS SEND THIS AS THE SUCCESS RESPONSE:
     			postID = sqlResult[0]["id"];	
-				console.log(postID);
-                res.status(200).send(
-				`
+                console.log(postID);
+                
+                if (req.files) {
+                    let sampleFile = req.files.sampleFile;
+                    sampleFile.mv('bucket/'+postID, function(err) {
+                        if (err) {
+                            console.error(err);
+                        }
+                    })
+                }
+
+                res.status(200).send(`
 						<p>File Uploaded! Redirecting.</p>
 						<script type="text/javascript">
 							window.location.href = 'http://localhost:3000/'
@@ -1398,33 +1405,38 @@ app.get('/search_users', (req, res) => {
             reason: 'SESSION_EXPIRED'
         })
     } else {
-    let sql = "select s.UID,s.username,p.displayname,p.email,p.email,p.gender,p.age,p.city from studentaccount s inner join studentprofile p on s.UID = p.UID where lower(s.username) like lower(?)";
-    var userName1 = req.query.username.replaceAll("%", "\\%");
-	var userName = userName1.replaceAll("_", "\\_");
-	let vars = ["%"+userName+"%"];    
-    con.query(sql, vars, function (err, result) {
-        if (err) {
-            if (err.code === 'ER_DUP_ENTRY') {
-                res.status(500).send({
-                    body: 'Couldn`t proceed with request',
-                    reason: 'Event_TAKEN'
-                })
-            } else {
-                console.log(err)
-                res.status(500).send({
-                    body: 'Couldn`t proceed with request',
-                    reason: 'SERVER_ERROR'
+        let sql = "select s.UID,s.username,p.displayname,p.email,p.email,p.gender,p.age,p.city from studentaccount s inner join studentprofile p on s.UID = p.UID where lower(s.username) like lower(?)";
+        var userName1 = req.query.username.replaceAll("%", "\\%");
+        var userName = userName1.replaceAll("_", "\\_");
+        let vars = ["%"+userName+"%"];    
+        con.query(sql, vars, function (err, result) {
+            if (err) {
+                if (err.code === 'ER_DUP_ENTRY') {
+                    res.status(500).send({
+                        body: 'Couldn`t proceed with request',
+                        reason: 'Event_TAKEN'
+                    })
+                } else {
+                    console.log(err)
+                    res.status(500).send({
+                        body: 'Couldn`t proceed with request',
+                        reason: 'SERVER_ERROR'
+                    })
+                }
+            } else {		
+                res.status(200).send({
+                    
+                    body: result
                 })
             }
-        } else {		
-            res.status(200).send({
-				
-                body: result
-            })
-        }
-    });
+        });
 	}
 })
+
+app.get('/image', (req, res) => {
+    res.sendFile('./bucket/'+req.query.imagePath, { root: __dirname });
+})
+
 
 String.prototype.replaceAll = function (find, replace) {
     var str = this;
