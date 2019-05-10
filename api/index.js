@@ -128,14 +128,10 @@ app.post('/update-profile', (req, res) => {
     } else {
         let uid = req.session.uid;
         let email = req.body.email;
-        let password = req.body.password;
         let gender = req.body.gender;
-        let country = req.body.country;
-        let state = req.body.state;
         let city = req.body.city;
-        let address = req.body.address;
-        let sql = "update StudentProfile set email = ?, gender = ?, city = ?, where uid = ?";
-        let vars = [email, password, gender, country, state, city, address, uid]
+        let sql = "update StudentProfile set displayName = ?, email = ?, gender = ?, age = ?, city = ? where uid = ?";
+        let vars = [req.body.displayName, email, gender, req.body.age, city, uid]
         con.query(sql, vars, (err, sqlResult) => {
             if (err) {
                 console.error(err)
@@ -1153,8 +1149,8 @@ app.post('/upload-post', function(req, res) {
 
 		//postContent contains the content_data. content_type is always 'text'
         let vars = [req.session.uid,req.body.postLocationId,
-                            req.body.postRestrictionId ? req.body.postRestrictionId : null,
-                            req.body.groupId ? req.body.groupID : null,
+                            req.body.postRestrictionId != -1 ? req.body.postRestrictionId : null,
+                            req.body.postGroupId != -1 ? req.body.postGroupId : null,
                             req.body.postTitle,contentType,req.body.postContent,imagePath]
         console.log(vars);
         
@@ -1374,28 +1370,25 @@ app.post('/subscribe_to_group', (req, res) => {
     });
 	}
 })
-app.get('/unsubscribe_group', (req, res) => {
+app.post('/unsubscribe_group', (req, res) => {
     if (!req.session.uid) {
         res.status(500).send({
             body: 'Session expired',
             reason: 'SESSION_EXPIRED'
         })
     } else {
-		
         let sql = "delete from studentgroup where UID = ? and GID = ?";
-        con.query(sql,[req.session.uid,req.query.groupID],(err, sqlResult) => {
-			
+        con.query(sql,[req.session.uid,req.body.groupID],(err, sqlResult) => {
             if (err) {
-				
                 console.log(err)
                 res.status(500).send({
                     body: 'Couldn`t proceed with request',
                     reason: 'SERVER_ERROR'
                 })
             
-        } else {		
+        } else {	
+            console.log('unsubscribed');	
             res.status(200).send({
-				
                 body: sqlResult
             })
         }
@@ -1436,6 +1429,31 @@ app.get('/search_users', (req, res) => {
             }
         });
 	}
+})
+
+app.get('/get_timeline', (req, res) => {
+    if (!req.session.uid) {
+        res.status(500).send({
+            body: 'Session expired',
+            reason: 'SESSION_EXPIRED'
+        })
+    } else {
+        let sql = "select eventType, eventId, timestamp from timeline where user_id = ? order by timestamp desc";
+        con.query(sql,[req.query.uid], (err, sqlResult) => {
+            if (err) {
+                console.log(err)
+                res.status(500).send({
+                    body: 'Couldn`t proceed with request',
+                    reason: 'SERVER_ERROR'
+                })
+            
+        } else {		
+            res.status(200).send({	
+                body: sqlResult
+            })
+        }
+        })
+    }
 })
 
 app.get('/image', (req, res) => {
