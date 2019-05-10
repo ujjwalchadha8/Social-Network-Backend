@@ -134,3 +134,11 @@ create table StudentGroup (
     UID integer not null references Student(UID),
     timestamp datetime not null
 )
+
+drop table if exists timeline;
+create table timeline(
+	user_id integer not null references StudentAccount(UID),
+    eventType varchar(70),
+    eventId integer,
+    timestamp datetime not null
+);

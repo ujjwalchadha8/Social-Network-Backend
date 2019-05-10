@@ -327,6 +327,7 @@ End if;
 if(imagePath is not null) then
 insert into Photos(post_id,photo) values (id, imagePath);
 End if;
+insert into timeline(user_id,eventType,eventId,timestamp) values(user_id,"upload_post",id,now());
 return id;
  
 end //

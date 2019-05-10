@@ -25,7 +25,8 @@ var con = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: 'SocialNetwork'
+    database: 'SocialNetwork',
+	multipleStatements: true
 });
   
 con.connect(function(err) {
@@ -730,8 +731,10 @@ app.post('/add_comment', (req, res) => {
             reason: 'SESSION_EXPIRED'
         })
     } else {
-    let sql = "insert into Comments(user_id,post_id,text,timestamp) values(?,?,?,now())";
-    let vars = [req.session.uid, req.body.postID,req.body.commentText];    
+	let eventType = "add_comment"
+    let sql = "insert into Comments(user_id,post_id,text,timestamp) values(?,?,?,now());";
+	sql+="insert into timeline(user_id,eventType,eventId,timestamp) values(?,?,?,now());";
+    let vars = [req.session.uid, req.body.postID,req.body.commentText,req.session.uid,eventType,req.body.postID];    
     con.query(sql, vars, function (err, result) {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
@@ -762,8 +765,10 @@ app.post('/add_like', (req, res) => {
             reason: 'SESSION_EXPIRED'
         })
     } else {
-    let sql = "insert into likes(user_id,post_id,timestamp) values(?,?,now())";
-    let vars = [req.session.uid, req.body.postID];    
+	let eventType = "add_like";
+    let sql = "insert into likes(user_id,post_id,timestamp) values(?,?,now());";	
+	sql+="insert into timeline(user_id,eventType,eventId,timestamp) values(?,?,?,now());";
+    let vars = [req.session.uid, req.body.postID,req.session.uid, eventType,req.body.postID];    
     con.query(sql, vars, function (err, result) {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
