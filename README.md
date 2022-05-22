@@ -6,4 +6,6 @@ This project is a frontend clone of a social media platform and includes functio
 2. Nodejs backend
 3. React frontend
 
+Explore all apis in api directory
+
 The frontend can be found [here](https://github.com/ujjwalchadha8/Social-Network-Front-End)
